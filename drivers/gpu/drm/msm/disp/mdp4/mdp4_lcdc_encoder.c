@@ -387,7 +387,6 @@ static void mdp4_lcdc_encoder_enable(struct drm_encoder *encoder)
 			MDP4_DMA_CONFIG_R_BPC(BPC6) |
 			MDP4_DMA_CONFIG_G_BPC(BPC6) |
 			MDP4_DMA_CONFIG_B_BPC(BPC6) |
-			MDP4_DMA_CONFIG_PACK_ALIGN_MSB |
 			MDP4_DMA_CONFIG_PACK(0x21) |
 			MDP4_DMA_CONFIG_DEFLKR_EN |
 			MDP4_DMA_CONFIG_DITHER_EN);
@@ -459,7 +458,7 @@ struct drm_encoder *mdp4_lcdc_encoder_init(struct drm_device *dev,
 	drm_encoder_helper_add(encoder, &mdp4_lcdc_encoder_helper_funcs);
 
 	/* TODO: do we need different pll in other cases? */
-	mdp4_lcdc_encoder->lcdc_clk = mpd4_lvds_pll_init(dev);
+	mdp4_lcdc_encoder->lcdc_clk = devm_clk_get(dev->dev, "lcdc_clk");; //mpd4_lvds_pll_init(dev);
 	if (IS_ERR(mdp4_lcdc_encoder->lcdc_clk)) {
 		dev_err(dev->dev, "failed to get lvds_clk\n");
 		ret = PTR_ERR(mdp4_lcdc_encoder->lcdc_clk);

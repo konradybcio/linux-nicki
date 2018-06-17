@@ -1587,6 +1587,29 @@ static const struct panel_desc lg_lp129qe = {
 	},
 };
 
+static const struct drm_display_mode lg_xga_mode = {
+	.clock = 96000,
+	.hdisplay = 1024,
+	.hsync_start = 1024 + 272,
+	.hsync_end = 1024 + 272 + 328,
+	.htotal = 1024 + 272 + 328 + 400,
+	.vdisplay = 768,
+	.vsync_start = 768 + 10,
+	.vsync_end = 768 + 10 + 7,
+	.vtotal = 768 + 10 + 7 + 6,
+	.vrefresh = 60,
+};
+
+static const struct panel_desc lg_xga = {
+	.modes = &lg_xga_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 272,
+		.height = 181,
+	},
+};
+
 static const struct drm_display_mode mitsubishi_aa070mc01_mode = {
 	.clock = 30400,
 	.hdisplay = 800,
@@ -2482,6 +2505,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "lg,lp129qe",
 		.data = &lg_lp129qe,
+	}, {
+		.compatible = "lg,xga",
+		.data = &lg_xga,
 	}, {
 		.compatible = "mitsubishi,aa070mc01-ca1",
 		.data = &mitsubishi_aa070mc01,

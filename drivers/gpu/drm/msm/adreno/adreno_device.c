@@ -356,7 +356,7 @@ static int adreno_suspend(struct device *dev)
 	struct platform_device *pdev = to_platform_device(dev);
 	struct msm_gpu *gpu = platform_get_drvdata(pdev);
 
-	return gpu->funcs->pm_suspend(gpu);
+	//return gpu->funcs->pm_suspend(gpu);
 }
 #endif
 
