@@ -508,6 +508,11 @@
 					compatible = "qcom,pm8058-vib";
 					reg = <0x4a>;
 				};
+
+				pwm@13c {
+					compatible = "qcom,pm8058-lpg";
+					reg = <0x13c>;
+				};
 			};
 		};
 
@@ -727,7 +732,7 @@
 		};
 
 		gpu: adreno@4300000 {
-			compatible = "qcom,adreno", "qcom,adreno-220.0";
+			compatible = "qcom,adreno-220.0", "qcom,adreno";
 			reg = <0x04300000 0x20000>;
 			reg-names = "kgsl_3d0_reg_memory";
 			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;

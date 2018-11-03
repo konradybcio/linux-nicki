@@ -35,7 +35,7 @@
 	};
 
 	chosen {
-		bootargs = "msm.vram=128m";
+		bootargs = "";
 	};
 
 	memory {
@@ -98,7 +98,7 @@
 	soc {
 		pinctrl@800000 {
 			/* eMMMC pins, all 8 data lines connected */
-			dragon_sdcc1_pins: sdcc1 {
+			sdcc1_pins: sdcc1 {
 				mux {
 					pins = "gpio159", "gpio160", "gpio161",
 					     "gpio162", "gpio163", "gpio164",
@@ -121,6 +121,24 @@
 					pins = "gpio159", "gpio160", "gpio161", "gpio162",
 					     "gpio163", "gpio164", "gpio165", "gpio166";
 					drive-strength = <10>;
+					bias-pull-up;
+				};
+			};
+
+			sdcc4_pins: sdcc4 {
+				clk {
+					pins = "sdc4_clk";
+					drive-strength = <8>;
+					bias-disable;
+				};
+				cmd {
+					pins = "sdc4_cmd";
+					drive-strength = <8>;
+					bias-pull-up;
+				};
+				data {
+					pins = "sdc4_data";
+					drive-strength = <8>;
 					bias-pull-up;
 				};
 			};
@@ -155,6 +173,18 @@
 				};
 				pinconf {
 					pins = "gpio47", "gpio48";
+					drive-strength = <16>;
+					bias-disable;
+				};
+			};
+
+			gsbi6_uart_pins: i2c4 {
+				mux {
+					pins = "gpio53", "gpio54", "gpio55", "gpio56";
+					function = "gsbi6";
+				};
+				pinconf {
+					pins = "gpio53", "gpio54", "gpio55", "gpio56";
 					drive-strength = <16>;
 					bias-disable;
 				};
@@ -219,6 +249,15 @@
 					drive-strength = <2>;
 					bias-disable;
                 };
+			};
+
+			wlan_gpios: wlan {
+				irq {
+					pins = "gpio93", "gpio135", "gpio137";
+					function = "gpio";
+					drive-strength = <2>;
+					bias-disable;
+				};
 			};
 
 			touch_pins: touch {
@@ -305,80 +344,13 @@
 				};
 #endif
 
-				led@48 {
-					/*
-					 * The keypad LED @0x48 is routed to
-					 * the sensor board where it is
-					 * connected to an infrared LED
-					 * SFH4650 (60mW, @850nm) next to the
-					 * ambient light and proximity sensor
-					 * Capella Microsystems CM3605.
-					 */
-					compatible = "qcom,pm8058-keypad-led";
-					reg = <0x48>;
-					label = "pm8058:infrared:proximitysensor";
-					default-state = "off";
-					linux,default-trigger = "cm3605";
-				};
-				led@131 {
-					compatible = "qcom,pm8058-led";
-					reg = <0x131>;
-					label = "pm8058:red";
-					default-state = "off";
-				};
-				led@132 {
-					/*
-					 * This is actually green too on my
-					 * board, but documented as yellow.
-					 */
-					compatible = "qcom,pm8058-led";
-					reg = <0x132>;
-					label = "pm8058:yellow";
-					default-state = "off";
-					linux,default-trigger = "mmc0";
-				};
-				led@133 {
-					compatible = "qcom,pm8058-led";
-					reg = <0x133>;
-					label = "pm8058:green";
-					default-state = "on";
-					linux,default-trigger = "heartbeat";
-				};
+
+
 			};
 		};
 
 #endif
-#if 0
-		rpm@104000 {
-			pm8901-regulators {
-				vdd_l5-supply = <&vph>;
-				lvs0_in-supply = <&pm8058_s3>;
 
-				l5 {
-					regulator-min-microvolt = <2850000>;
-					regulator-max-microvolt = <2850000>;
-					bias-pull-down;
-				};
-
-				lvs0 {
-					regulator-always-on;
-				};
-			};
-
-			pm8058-regulators {
-				vdd_s3-supply = <&vph>;
-
-				s3 {
-					regulator-min-microvolt = <1800000>;
-					regulator-max-microvolt = <1800000>;
-					qcom,switch-mode-frequency = <1600000>;
-					regulator-always-on;
-					bias-pull-down;
-				};
-			};
-		};
-#endif
-#if 1
 		rpm@104000 {
 			pm8901-regulators {
 				vdd_l0-supply = <&pm8901_s4>;
@@ -407,6 +379,8 @@
 					regulator-min-microvolt = <3300000>;
 					regulator-max-microvolt = <3300000>;
 					bias-pull-down;
+
+					regulator-always-on; // wifi
 				};
 				l2 {
 					regulator-min-microvolt = <2850000>;
@@ -417,6 +391,8 @@
 					regulator-min-microvolt = <3300000>;
 					regulator-max-microvolt = <3300000>;
 					bias-pull-down;
+
+					regulator-always-on; // wifi
 				};
 				l4 {
 					regulator-min-microvolt = <2600000>;
@@ -585,9 +561,11 @@
 					bias-pull-down;
 				};
 				l19 {
-					regulator-min-microvolt = <2500000>;
-					regulator-max-microvolt = <2500000>;
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <1800000>;
 					bias-pull-down;
+
+					regulator-always-on; // wifi
 				};
 				l20 {
 					regulator-min-microvolt = <1800000>;
@@ -678,21 +656,6 @@
 				};
 			};
 		};
-#endif
-
-
-		amba {
-			/* Internal 3.69 GiB eMMC */
-			sdcc@12400000 {
-				status = "okay";
-				pinctrl-names = "default";
-				pinctrl-0 = <&dragon_sdcc1_pins>;
-				vmmc-supply = <&dummy0>;
-				//vmmc-supply = <&pm8901_l5>;
-				vqmmc-supply = <&dummy1>;
-				//vqmmc-supply = <&pm8901_lvs0>;
-			};
-		};
 
 		usb@12500000 {
 			status = "okay";
@@ -705,8 +668,15 @@
 			};
 		};
 
+		/* 16MiB for scanouts, drm/msm doesn't use the base address */
+		scanout_mem: scanout_mem@0 {
+			reg = <0x0 0x1000000>;
+			no-map;
+		};
+
 		mdp@5100000 {
 			status = "okay";
+			memory-region = <&scanout_mem>;
 
 			ports {
 				port@0 {
@@ -816,6 +786,37 @@
 	// 78: mt9m113
 };
 
+&gsbi6 {
+	status = "okay";
+	qcom,mode = <GSBI_PROT_UART_W_FC>;
+};
+
+/*
+#define BT_RST_N			138
+#define BT_POWER			130
+#define BT_WAKE				131
+#define BT_HOST_WAKE	129
+*/
+
+&gsbi6_serial {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&gsbi6_uart_pins>;
+
+	/* bluetooth {
+		compatible = "brcm,bcm43438-bt";
+		// max-speed = <3000000>;
+
+		//pinctrl-names = "default";
+		// pinctrl-0 = <&bt_pin>, <&wlan_sleep_clk_pin>;
+
+		//host-wakeup-gpios = <&msmgpio 42 GPIO_ACTIVE_HIGH>;
+		//device-wakeup-gpios = <&msmgpio 62 GPIO_ACTIVE_HIGH>;
+		//shutdown-gpios = <&msmgpio 41 GPIO_ACTIVE_HIGH>;
+	}; */
+};
+
 &gsbi7 {
 	status = "okay";
 	qcom,mode = <GSBI_PROT_I2C>;
@@ -865,5 +866,44 @@
 	};
 };
 
+&sdcc1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdcc1_pins>;
+	vmmc-supply = <&pm8901_l5>;
+	vqmmc-supply = <&pm8901_lvs0>;
+};
 
+&sdcc4 {
+	status = "ok";
+	// non-removable;
+	broken-cd;
+
+	vmmc-supply = <&pm8058_s3>;
+	mmc-ddr-1_8v;
+
+	// "8901_l3"  - 3.3V - VREG_L3B_3V3      - WLAN_PA_3V3
+	// "8901_l1"  - 3.3V - VREG_L1B_3V3      - VDD_WLAN_3V3
+	// "8058_l19" - 1.8V - VREG_L19A_1V8     - VDD_1.8
+	// "8058_s3"  - 1.8V - VREG_S3A_1V8_WLAN - DVDD_SDIO_1V8 etc.
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdcc4_pins>, <&wlan_gpios>;
+
+	/*
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	wifi@1 {
+		reg = <1>;
+	}; */
+};
+
+/*
+#define TENDERLOIN_GPIO_WL_HOST_WAKE	93
+#define TENDERLOIN_GPIO_HOST_WAKE_WL	137
+#define TENDERLOIN_GPIO_HOST_WAKE_WL_3G	80
+#define TENDERLOIN_GPIO_WLAN_RST_N	135
+#define TENDERLOIN_GPIO_WLAN_RST_N_3G	28
+*/
 

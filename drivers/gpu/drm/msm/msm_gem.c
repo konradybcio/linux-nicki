@@ -914,8 +914,10 @@ static struct drm_gem_object *_msm_gem_new(struct drm_device *dev,
 
 	if (!msm_use_mmu(dev))
 		use_vram = true;
-	else if ((flags & MSM_BO_STOLEN) && priv->vram.size)
+	else if (((flags & MSM_BO_STOLEN) || size == 3145728) && priv->vram.size)
 		use_vram = true;
+
+	printk("_msm_gem_new %u bytes use_vram=%u\n", size, use_vram);
 
 	if (WARN_ON(use_vram && !priv->vram.size))
 		return ERR_PTR(-EINVAL);
