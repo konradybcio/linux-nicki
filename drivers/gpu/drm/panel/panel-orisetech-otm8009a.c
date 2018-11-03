@@ -67,19 +67,19 @@ struct otm8009a {
 };
 
 static const struct drm_display_mode default_mode = {
-	.clock = 32729,
+	.clock = 30513, // 32729
 	.hdisplay = 480,
-	.hsync_start = 480 + 120,
-	.hsync_end = 480 + 120 + 63,
-	.htotal = 480 + 120 + 63 + 120,
-	.vdisplay = 800,
-	.vsync_start = 800 + 12,
-	.vsync_end = 800 + 12 + 12,
-	.vtotal = 800 + 12 + 12 + 12,
-	.vrefresh = 50,
+	.hsync_start = 480 + 46,
+	.hsync_end = 480 + 46 + 4,
+	.htotal = 480 + 46 + 4 + 44,
+	.vdisplay = 854,
+	.vsync_start = 854 + 15,
+	.vsync_end = 854 + 15 + 1,
+	.vtotal = 854 + 15 + 1 + 16,
+	.vrefresh = 60,
 	.flags = 0,
-	.width_mm = 52,
-	.height_mm = 86,
+	.width_mm = 51,
+	.height_mm = 90,
 };
 
 static inline struct otm8009a *panel_to_otm8009a(struct drm_panel *panel)
