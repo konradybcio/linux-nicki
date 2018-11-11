@@ -14,7 +14,7 @@
 
 / {
 	model = "Qualcomm MSM8930";
-	compatible = "qcom,msm8930";
+	compatible = "qcom,msm8930", "qcom,msm8227", "qcom,msm8627";
 	interrupt-parent = <&intc>;
 
 	reserved-memory {
