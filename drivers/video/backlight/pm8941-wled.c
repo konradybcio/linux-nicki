@@ -20,14 +20,14 @@
 /* From DT binding */
 #define PM8941_WLED_DEFAULT_BRIGHTNESS		2048
 
-#define PM8941_WLED_REG_VAL_BASE		0x40
+#define PM8941_WLED_REG_VAL_BASE		0x04 //0x40
 #define  PM8941_WLED_REG_VAL_MAX		0xFFF
 
-#define PM8941_WLED_REG_MOD_EN			0x46
-#define  PM8941_WLED_REG_MOD_EN_BIT		BIT(7)
-#define  PM8941_WLED_REG_MOD_EN_MASK		BIT(7)
+#define PM8941_WLED_REG_MOD_EN			0x0	  //0x46
+#define  PM8941_WLED_REG_MOD_EN_BIT		0x7f  //BIT(7)
+#define  PM8941_WLED_REG_MOD_EN_MASK	0x7f  //BIT(7)
 
-#define PM8941_WLED_REG_SYNC			0x47
+#define PM8941_WLED_REG_SYNC			0x0a //0x47
 #define  PM8941_WLED_REG_SYNC_MASK		0x07
 #define  PM8941_WLED_REG_SYNC_LED1		BIT(0)
 #define  PM8941_WLED_REG_SYNC_LED2		BIT(1)
@@ -35,21 +35,21 @@
 #define  PM8941_WLED_REG_SYNC_ALL		0x07
 #define  PM8941_WLED_REG_SYNC_CLEAR		0x00
 
-#define PM8941_WLED_REG_FREQ			0x4c
-#define  PM8941_WLED_REG_FREQ_MASK		0x0f
+//#define PM8941_WLED_REG_FREQ			0x4c
+//#define  PM8941_WLED_REG_FREQ_MASK		0x0f
 
-#define PM8941_WLED_REG_OVP			0x4d
-#define  PM8941_WLED_REG_OVP_MASK		0x03
+#define PM8941_WLED_REG_OVP				0x0c //0x4d
+#define  PM8941_WLED_REG_OVP_MASK		0x30 //0x03
 
-#define PM8941_WLED_REG_BOOST			0x4e
-#define  PM8941_WLED_REG_BOOST_MASK		0x07
+#define PM8941_WLED_REG_BOOST			0x0d //0x4e
+#define  PM8941_WLED_REG_BOOST_MASK		0xe0 //0x07
 
-#define PM8941_WLED_REG_SINK			0x4f
-#define  PM8941_WLED_REG_SINK_MASK		0xe0
-#define  PM8941_WLED_REG_SINK_SHFT		0x05
+//#define PM8941_WLED_REG_SINK			0x4f
+//#define  PM8941_WLED_REG_SINK_MASK		0xe0
+//#define  PM8941_WLED_REG_SINK_SHFT		0x05
 
 /* Per-'string' registers below */
-#define PM8941_WLED_REG_STR_OFFSET		0x10
+/* #define PM8941_WLED_REG_STR_OFFSET		0x10
 
 #define PM8941_WLED_REG_STR_MOD_EN_BASE		0x60
 #define  PM8941_WLED_REG_STR_MOD_MASK		BIT(7)
@@ -65,7 +65,7 @@
 
 #define PM8941_WLED_REG_STR_CABC_BASE		0x66
 #define  PM8941_WLED_REG_STR_CABC_MASK		BIT(7)
-#define  PM8941_WLED_REG_STR_CABC_EN		BIT(7)
+#define  PM8941_WLED_REG_STR_CABC_EN		BIT(7) */
 
 struct pm8941_wled_config {
 	u32 i_boost_limit;
@@ -109,7 +109,7 @@ static int pm8941_wled_update_status(struct backlight_device *bl)
 		return rc;
 
 	for (i = 0; i < wled->cfg.num_strings; ++i) {
-		u8 v[2] = { val & 0xff, (val >> 8) & 0xf };
+		u8 v[2] = { 0x70 | (val >> 8) & 0xf, val & 0xff };
 
 		rc = regmap_bulk_write(wled->regmap,
 				wled->addr + PM8941_WLED_REG_VAL_BASE + 2 * i,
@@ -134,26 +134,27 @@ static int pm8941_wled_setup(struct pm8941_wled *wled)
 {
 	int rc;
 	int i;
+	u16 val = 2048;
 
 	rc = regmap_update_bits(wled->regmap,
 			wled->addr + PM8941_WLED_REG_OVP,
-			PM8941_WLED_REG_OVP_MASK, wled->cfg.ovp);
+			PM8941_WLED_REG_OVP_MASK, wled->cfg.ovp << 4);
 	if (rc)
 		return rc;
 
 	rc = regmap_update_bits(wled->regmap,
 			wled->addr + PM8941_WLED_REG_BOOST,
-			PM8941_WLED_REG_BOOST_MASK, wled->cfg.i_boost_limit);
+			PM8941_WLED_REG_BOOST_MASK | 0x1c, wled->cfg.i_boost_limit << 5 | 4);
 	if (rc)
 		return rc;
 
-	rc = regmap_update_bits(wled->regmap,
+	/* rc = regmap_update_bits(wled->regmap,
 			wled->addr + PM8941_WLED_REG_FREQ,
 			PM8941_WLED_REG_FREQ_MASK, wled->cfg.switch_freq);
 	if (rc)
-		return rc;
+		return rc; */
 
-	if (wled->cfg.cs_out_en) {
+	/* if (wled->cfg.cs_out_en) {
 		u8 all = (BIT(wled->cfg.num_strings) - 1)
 				<< PM8941_WLED_REG_SINK_SHFT;
 
@@ -162,10 +163,10 @@ static int pm8941_wled_setup(struct pm8941_wled *wled)
 				PM8941_WLED_REG_SINK_MASK, all);
 		if (rc)
 			return rc;
-	}
+	} */
 
 	for (i = 0; i < wled->cfg.num_strings; ++i) {
-		u16 addr = wled->addr + PM8941_WLED_REG_STR_OFFSET * i;
+		/*u16 addr = wled->addr + PM8941_WLED_REG_STR_OFFSET * i;
 
 		rc = regmap_update_bits(wled->regmap,
 				addr + PM8941_WLED_REG_STR_MOD_EN_BASE,
@@ -196,8 +197,40 @@ static int pm8941_wled_setup(struct pm8941_wled *wled)
 				wled->cfg.cabc_en ?
 					PM8941_WLED_REG_STR_CABC_EN : 0);
 		if (rc)
+			return rc; */
+	}
+
+	rc = regmap_update_bits(wled->regmap,
+			wled->addr + PM8941_WLED_REG_MOD_EN,
+			PM8941_WLED_REG_MOD_EN_MASK, PM8941_WLED_REG_MOD_EN_BIT);
+	if (rc)
+		return rc;
+
+	rc = regmap_update_bits(wled->regmap,
+			wled->addr + 14,
+			0xff, 0x3f);
+	if (rc)
+		return rc;
+
+	for (i = 0; i < wled->cfg.num_strings; ++i) {
+		u8 v[2] = { 0x70 | (val >> 8) & 0xf, val & 0xff };
+
+		rc = regmap_bulk_write(wled->regmap,
+				wled->addr + PM8941_WLED_REG_VAL_BASE + 2 * i,
+				v, 2);
+		if (rc)
 			return rc;
 	}
+
+	rc = regmap_update_bits(wled->regmap,
+			wled->addr + PM8941_WLED_REG_SYNC,
+			PM8941_WLED_REG_SYNC_MASK, PM8941_WLED_REG_SYNC_ALL);
+	if (rc)
+		return rc;
+
+	rc = regmap_update_bits(wled->regmap,
+			wled->addr + PM8941_WLED_REG_SYNC,
+			PM8941_WLED_REG_SYNC_MASK, PM8941_WLED_REG_SYNC_CLEAR);
 
 	return 0;
 }
