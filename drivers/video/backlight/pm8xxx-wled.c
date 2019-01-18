@@ -1,3 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+/* hacked up pm8941_wled.c based off downstream leds-pm8xxx.c
+ * good enough for battery not to discharge
+ */
+
 /* Copyright (c) 2015, Sony Mobile Communications, AB.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -446,7 +451,7 @@ static int pm8941_wled_probe(struct platform_device *pdev)
 };
 
 static const struct of_device_id pm8941_wled_match_table[] = {
-	{ .compatible = "qcom,pm8941-wled" },
+	{ .compatible = "qcom,pm8xxx-wled" },
 	{}
 };
 MODULE_DEVICE_TABLE(of, pm8941_wled_match_table);
@@ -454,12 +459,12 @@ MODULE_DEVICE_TABLE(of, pm8941_wled_match_table);
 static struct platform_driver pm8941_wled_driver = {
 	.probe = pm8941_wled_probe,
 	.driver	= {
-		.name = "pm8941-wled",
+		.name = "pm8xxx-wled",
 		.of_match_table	= pm8941_wled_match_table,
 	},
 };
 
 module_platform_driver(pm8941_wled_driver);
 
-MODULE_DESCRIPTION("pm8941 wled driver");
+MODULE_DESCRIPTION("pm8xxx wled driver");
 MODULE_LICENSE("GPL v2");
