@@ -193,7 +193,7 @@ missing: flash, camera, (status leds?), radio?,
 			};
 		};
 
-#if 0
+#if 1
 		gpu: adreno-3xx@4300000 {
 			compatible =  "qcom,adreno-305.2", "qcom,adreno"; // or .0 ?
 			reg = <0x04300000 0x20000>;
@@ -267,7 +267,7 @@ missing: flash, camera, (status leds?), radio?,
 			label = "MDSS DSI CTRL->0";
 			#address-cells = <1>;
 			#size-cells = <0>;
-			interrupts = <GIC_SPI 82 0>;
+			interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x04700000 0x200>;
 			reg-names = "dsi_ctrl";
 
@@ -336,7 +336,7 @@ afab: 533000000
 				<0x04700300 0x200>,
 				<0x04700500 0x5c>;
 			reg-names = "dsi_pll", "dsi_phy", "dsi_phy_regulator";
-			clock-names = "iface_clk";
+			clock-names = "iface";
 			clocks = <&mmcc DSI_M_AHB_CLK>;
 		};
 
@@ -501,23 +501,28 @@ afab: 533000000
 
 		usb@12500000 {
 			status = "okay";
-			dr_mode = "otg";
+			/* use peripheral mode until we hook up otg detection */
+			dr_mode = "peripheral";
 			ulpi {
 				phy {
 					v3p3-supply = <&pm8038_l3>;
 					v1p8-supply = <&pm8038_l4>;
+					qcom,init-seq = /bits/ 8 <
+						0x44 0x80 /* set VBUS valid threshold and disconnect valid threshold */
+						0x38 0x81 /* update DC voltage level */
+						0x3C 0x82 /* set preemphasis and rise/fall time */
+						0x13 0x83 /* set source impedance adjusment */
+						>;
 				};
 			};
 		};
 
-#if 1
 		riva-pil@3204000 {
 			status = "okay";
 
 			pinctrl-names = "default";
 			pinctrl-0 = <&riva_wlan_pin_a>, <&riva_bt_pin_a>, <&riva_fm_pin_a>;
 		};
-#endif
 
 #if 0
 		camss: camss@4500000 {
@@ -654,6 +659,17 @@ afab: 533000000
 		mux {
 			pins = "gpio108";
 			function = "ps_hold";
+        };
+    };
+    
+    	pmic_int: pmic_int {
+		irq {
+			pins = "gpio104";
+			function = "gpio";
+
+			drive-strength = <2>;
+			bias-pull-down;
+			
 		};
 	};
 
