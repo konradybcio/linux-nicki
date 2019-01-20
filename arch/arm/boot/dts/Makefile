@@ -763,7 +763,6 @@ dtb-$(CONFIG_ARCH_QCOM) += \
 	qcom-ipq8064-ap148.dtb \
 	qcom-msm8627-sony-xperia-nicki.dtb \
 	qcom-msm8660-surf.dtb \
-	qcom-msm8930-lumia625.dtb \
 	qcom-msm8960-cdp.dtb \
 	qcom-msm8974-fairphone-fp2.dtb \
 	qcom-msm8974-oneplus-bacon.dtb \
