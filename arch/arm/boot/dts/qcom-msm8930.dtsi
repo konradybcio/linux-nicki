@@ -17,22 +17,6 @@
 	compatible = "qcom,msm8930";
 	interrupt-parent = <&intc>;
 
-	memory {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		ranges;
-
-		reg = <0x80000000 0x20000000>;
-	};
-
-
-#if 0
-00000000  80 20 00 00 08 c0 00 00  8e c0 00 00 00 40 00 00  |. ...........@..|
-00000010  8f 80 00 00 00 30 00 00  8f e0 00 00 00 10 00 00  |.....0..........|
-00000020  90 00 00 00 10 00 00 00                           |........|
-00000028
-#endif
-
 	reserved-memory {
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -213,11 +197,9 @@
 
 	firmware {
 		scm {
-			compatible = "qcom,scm-apq8064";
-
-			// msm8960
-			// clocks = <&rpmcc RPM_DAYTONA_FABRIC_CLK>;
-			// clock-names = "core";
+			compatible = "qcom,scm-msm8960";
+			clocks = <&rpmcc RPM_DAYTONA_FABRIC_CLK>;
+			clock-names = "core";
 		};
 	};
 
@@ -329,7 +311,7 @@
 				pinctrl-1 = <&i2c3_pins_sleep>;
 				pinctrl-names = "default", "sleep";
 				reg = <0x16280000 0x1000>;
-				interrupts = <GIC_SPI 151 IRQ_TYPE_NONE>;
+				interrupts = <GIC_SPI 151 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&gcc GSBI3_QUP_CLK>,
 					 <&gcc GSBI3_H_CLK>;
 				clock-names = "core", "iface";
@@ -355,7 +337,7 @@
 				pinctrl-1 = <&i2c4_pins_sleep>;
 				pinctrl-names = "default", "sleep";
 				reg = <0x16380000 0x1000>;
-				interrupts = <GIC_SPI 153 IRQ_TYPE_NONE>;
+				interrupts = <GIC_SPI 153 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&gcc GSBI4_QUP_CLK>,
 					 <&gcc GSBI4_H_CLK>;
 				clock-names = "core", "iface";
@@ -379,7 +361,7 @@
 				pinctrl-1 = <&i2c12_pins_sleep>;
 				pinctrl-names = "default", "sleep";
 				reg = <0x124a0000 0x1000>;
-				interrupts = <GIC_SPI 196 IRQ_TYPE_NONE>;
+				interrupts = <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&gcc GSBI12_QUP_CLK>,
 					 <&gcc GSBI12_H_CLK>;
 				clock-names = "core", "iface";
@@ -395,9 +377,6 @@
 			clock-names = "core";
 		};
 
-		// ssbi c00000
-
-#if 1
 		qcom,ssbi@500000 {
 			compatible = "qcom,ssbi";
 			reg = <0x500000 0x1000>;
@@ -405,12 +384,14 @@
 
 			pmicintc: pmic@0 {
 				compatible = "qcom,pm8038";
-				interrupt-parent = <&msmgpio>;
-				interrupts = <104 8>;
+				interrupts-extended = <&msmgpio 104 IRQ_TYPE_LEVEL_LOW>;
 				#interrupt-cells = <2>;
 				interrupt-controller;
 				#address-cells = <1>;
 				#size-cells = <0>;
+
+				pinctrl-0 = <&pmic_int>;
+				pinctrl-names = "default";
 
 				pwrkey@1c {
 					compatible = "qcom,pm8921-pwrkey";
@@ -444,9 +425,9 @@
 					allow-set-time;
 				};
 
-#if 1
+				/* using hacked up pm8941 driver */
 				wled@25A {
-					compatible = "qcom,pm8941-wled";
+					compatible = "qcom,pm8xxx-wled";
 					reg = <0x25A>;
 					label = "backlight";
 
@@ -459,7 +440,6 @@
 					qcom,ovp = <32>;
 					qcom,num-strings = <2>;
 				};
-#endif
 
 				/* xoadc: xoadc@197 {
 					compatible = "qcom,pm8038-adc";
@@ -511,7 +491,7 @@
 				}; */
 
 				smbb: charger@0 {
-					compatible = "qcom,pm8941-charger";
+					compatible = "qcom,pm8921-charger";
 					reg = <0x0>;
 
 					interrupt-parent = <&pmicintc>;
@@ -535,7 +515,6 @@
 				};
 			};
 		};
-#endif
 
 		qfprom: qfprom@700000 {
 			compatible	= "qcom,qfprom";
@@ -596,15 +575,15 @@
 			reg		= <0x108000 0x1000>;
 			qcom,ipc	= <&l2cc 0x8 2>;
 
-			interrupts	= <GIC_SPI 19 IRQ_TYPE_EDGE_RISING>,
-					  <GIC_SPI 21 IRQ_TYPE_EDGE_RISING>,
-					  <GIC_SPI 22 IRQ_TYPE_EDGE_RISING>;
+			interrupts	= <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>,
+					  <GIC_SPI 21 IRQ_TYPE_LEVEL_HIGH>,
+					  <GIC_SPI 22 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names	= "ack", "err", "wakeup";
 
-			/* rpmcc: clock-controller {
+			rpmcc: clock-controller {
 				compatible	= "qcom,rpmcc-msm8930", "qcom,rpmcc";
 				#clock-cells = <1>;
-			}; */
+			};
 
 			regulators {
 				compatible = "qcom,rpm-pm8038-regulators";
@@ -662,6 +641,9 @@
 			clock-names = "core", "iface";
 			assigned-clocks = <&gcc USB_HS1_XCVR_CLK>;
 			assigned-clock-rates = <60000000>;
+
+			// <&rpmcc RPM_DAYTONA_FABRIC_CLK> is real core clk?
+
 			resets = <&gcc USB_HS1_RESET>;
 			reset-names = "core";
 			phy_type = "ulpi";
@@ -677,8 +659,8 @@
 						     "qcom,usb-hs-phy";
 					clocks = <&sleep_clk>, <&cxo_board>;
 					clock-names = "sleep", "ref";
-					resets = <&usb1 0>;
-					reset-names = "por";
+					resets = <&gcc USB_PHY0_RESET>, <&usb1 0>;
+					reset-names = "phy", "por";
 					#phy-cells = <0>;
 				};
 			};
@@ -689,7 +671,7 @@
 		sdcc1bam:dma@12402000{
 			compatible = "qcom,bam-v1.3.0";
 			reg = <0x12402000 0x8000>;
-			interrupts = <0 98 0>;
+			interrupts = <0 98 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&gcc SDC1_H_CLK>;
 			clock-names = "bam_clk";
 			#dma-cells = <1>;
@@ -749,7 +731,7 @@
 			iris {
 				compatible = "qcom,wcn3660";
 
-				clocks = <&cxo_board>; // <&rpmcc RPM_CXO_CLK>;
+				clocks = <&cxo_board>;
 				clock-names = "xo";
 
 				vddxo-supply = <&pm8038_l4>;
