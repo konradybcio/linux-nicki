@@ -192,8 +192,8 @@ missing: flash, camera, (status leds?), radio?,
 				vmmc-supply = <&vsdcc_fixed>; //
 			};
 		};
-
-#if 1
+//adreno
+#if 0
 		gpu: adreno-3xx@4300000 {
 			compatible =  "qcom,adreno-305.2", "qcom,adreno"; // or .0 ?
 			reg = <0x04300000 0x20000>;
@@ -211,7 +211,6 @@ missing: flash, camera, (status leds?), radio?,
 			    <&mmcc GFX3D_AXI_CLK>,
 			    <&mmcc MMSS_IMEM_AHB_CLK>;
 
-#if 1
 			iommus = <&gfx3d 0
 				  &gfx3d 1
 				  &gfx3d 2
@@ -244,7 +243,6 @@ missing: flash, camera, (status leds?), radio?,
 				  &gfx3d 29
 				  &gfx3d 30
 				  &gfx3d 31>;
-#endif
 
 			qcom,gpu-pwrlevels {
 				compatible = "qcom,gpu-pwrlevels";
@@ -256,7 +254,7 @@ missing: flash, camera, (status leds?), radio?,
 				};
 			};
 		};
-
+#endif
 		mmss_sfpb: syscon@5700000 {
 			compatible = "syscon";
 			reg = <0x5700000 0x70>;
@@ -413,7 +411,7 @@ afab: 533000000
 
 			panel@0 {
 				reg = <0>;
-				compatible = "sharp,ls043t1le01-qhd";
+				compatible = "sharp,ls043t1le01-qhd"; //not for nicki tho
 
 				reset-gpios = <&msmgpio 58 GPIO_ACTIVE_HIGH>;
 
@@ -447,7 +445,6 @@ afab: 533000000
 			status = "okay";
 			vddio-supply = <&pm8038_l23>;/*VDD_PLL2_1 to 7*/
 		};
-#endif
 
 #if 1
 		mdp_port0: iommu@7500000 {
