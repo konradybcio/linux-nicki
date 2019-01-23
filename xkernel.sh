@@ -1,5 +1,4 @@
-pmbootstrap chroot -- apk add abootimg android-tools mkbootimg dtbtool
-cd .output/arch/arm/boot
+cd arch/arm/boot
 cat zImage dts/qcom-msm8627-sony-xperia-nicki.dtb > ~/projects/linux-nicki-mainline/.zImage-dtb
 cp ~/projects/linux-nicki-mainline/.zImage-dtb "$TEMP"/zImage-dtb
 cp "/tmp/postmarketOS-export/boot.img-$DEVICE" "$TEMP/boot.img"
