@@ -13,6 +13,7 @@ missing: flash, camera, (status leds?), radio?,
 
 	chosen {
 		bootargs = "cma=256m";
+		stdout-path = "serial0:115200n8";
 		//linux,initrd-start = <0x82200000>;
 		//linux,initrd-end = <0x82a54f30>;
 	};
