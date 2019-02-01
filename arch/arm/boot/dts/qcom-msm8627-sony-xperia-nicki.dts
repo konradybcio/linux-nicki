@@ -12,7 +12,7 @@ missing: flash, camera, (status leds?), radio?,
 	compatible = "qcom,msm8930", "qcom,msm8627", "qcom,msm8627-mtp", "qcom,msm8227";
 
 	chosen {
-		bootargs = "cma=256m";
+		bootargs = "cma=64m";
 		stdout-path = "serial0:115200n8";
 		//linux,initrd-start = <0x82200000>;
 		//linux,initrd-end = <0x82a54f30>;
