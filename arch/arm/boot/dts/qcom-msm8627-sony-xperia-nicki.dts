@@ -467,8 +467,8 @@ afab: 533000000
 			    <&mmcc MDP_AXI_CLK>;
 			reg = <0x07500000 0x100000>;
 			interrupts =
-			    <GIC_SPI 63 0>,
-			    <GIC_SPI 64 0>;
+			    <GIC_SPI 63 IRQ_TYPE_LEVEL_HIGH>,
+			    <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
 			qcom,ncb = <2>;
 		};
 
@@ -483,8 +483,8 @@ afab: 533000000
 			    <&mmcc MDP_AXI_CLK>;
 			reg = <0x07600000 0x100000>;
 			interrupts =
-			    <GIC_SPI 61 0>,
-			    <GIC_SPI 62 0>;
+			    <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>,
+			    <GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>;
 			qcom,ncb = <2>;
 		};
 
@@ -499,8 +499,8 @@ afab: 533000000
 			    <&mmcc GFX3D_AXI_CLK>;
 			reg = <0x07c00000 0x100000>;
 			interrupts =
-			    <GIC_SPI 69 0>,
-			    <GIC_SPI 70 0>;
+			    <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>,
+			    <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
 			qcom,ncb = <3>;
 		};
 #endif
