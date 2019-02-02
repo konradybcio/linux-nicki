@@ -24,7 +24,6 @@ missing: flash, camera, (status leds?), radio?,
 				compatible = "qcom,rpm-pm8038-regulators";
 
 
-#if 1
 				vdd_l1-supply = <&pm8038_s2>;
 				vdd_l2_l20-supply = <&pm8038_s2>;
 				vdd_l12_l24_l26-supply = <&pm8038_s2>;
@@ -164,7 +163,6 @@ missing: flash, camera, (status leds?), radio?,
 					regulator-min-microvolt = <3>;
 					regulator-max-microvolt = <3>;
 				};
-#endif
 			};
 		};
 
@@ -194,7 +192,6 @@ missing: flash, camera, (status leds?), radio?,
 			};
 		};
 
-#if 1
 		gpu: adreno-3xx@4300000 {
 			compatible =  "qcom,adreno-305.2", "qcom,adreno"; // or .0 ?
 			reg = <0x04300000 0x20000>;
@@ -212,7 +209,6 @@ missing: flash, camera, (status leds?), radio?,
 			    <&mmcc GFX3D_AXI_CLK>,
 			    <&mmcc MMSS_IMEM_AHB_CLK>;
 
-#if 1
 			iommus = <&gfx3d 0
 				  &gfx3d 1
 				  &gfx3d 2
@@ -245,7 +241,6 @@ missing: flash, camera, (status leds?), radio?,
 				  &gfx3d 29
 				  &gfx3d 30
 				  &gfx3d 31>;
-#endif
 
 			qcom,gpu-pwrlevels {
 				compatible = "qcom,gpu-pwrlevels";
@@ -364,10 +359,8 @@ afab: 533000000
 				  &mdp_port1 2>;
 #endif
 
-#if 1
                         iommus = <&mdp_port0 0
                                   &mdp_port0 2>;
-#endif
 
 			ports {
 				#address-cells = <1>;
@@ -453,9 +446,7 @@ afab: 533000000
 			status = "okay";
 			vddio-supply = <&pm8038_l23>;/*VDD_PLL2_1 to 7*/
 		};
-#endif
 
-#if 1
 		mdp_port0: iommu@7500000 {
 			compatible = "qcom,apq8064-iommu";
 			#iommu-cells = <1>;
@@ -503,7 +494,6 @@ afab: 533000000
 			    <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
 			qcom,ncb = <3>;
 		};
-#endif
 
 		usb@12500000 {
 			status = "okay";
