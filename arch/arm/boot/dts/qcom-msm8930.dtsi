@@ -235,10 +235,7 @@
 			#gpio-cells = <2>;
 			interrupt-controller;
 			#interrupt-cells = <2>;
-			interrupts = <0 16 IRQ_TYPE_LEVEL_HIGH>;
-
-			pinctrl-names = "default";
-			pinctrl-0 = <&ps_hold>;
+			interrupts = <0 16 0x4>;
 		};
 
 		sfpb_wrapper_mutex: syscon@1200000 {
