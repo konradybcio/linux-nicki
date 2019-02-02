@@ -381,7 +381,8 @@
 
 			pmicintc: pmic@0 {
 				compatible = "qcom,pm8038";
-				interrupts-extended = <&msmgpio 104 IRQ_TYPE_LEVEL_LOW>;
+				interrupt-parent = <&msmgpio>;
+				interrupts = <104 8>;
 				#interrupt-cells = <2>;
 				interrupt-controller;
 				#address-cells = <1>;
