@@ -357,11 +357,16 @@ afab: 533000000
 				      "lut_clk",
 				      "hdmi_clk",
 				      "tv_clk";
-#if 1
+#if 0
 			iommus = <&mdp_port0 0
 				  &mdp_port0 2
 				  &mdp_port1 0
 				  &mdp_port1 2>;
+#endif
+
+#if 1
+                        iommus = <&mdp_port0 0
+                                  &mdp_port0 2>;
 #endif
 
 			ports {
@@ -414,7 +419,7 @@ afab: 533000000
 
 			panel@0 {
 				reg = <0>;
-				compatible = "sharp,ls043t1le01-qhd";
+				compatible = "panel-lvds";
 
 				reset-gpios = <&msmgpio 58 GPIO_ACTIVE_HIGH>;
 
