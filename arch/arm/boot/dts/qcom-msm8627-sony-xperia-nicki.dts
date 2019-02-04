@@ -495,22 +495,6 @@ afab: 533000000
 			qcom,ncb = <3>;
 		};
 
-		usb@12500000 {
-			status = "okay";
-			ulpi {
-				phy {
-					v3p3-supply = <&pm8038_l3>;
-					v1p8-supply = <&pm8038_l4>;
-					qcom,init-seq = /bits/ 8 <
-						0x44 0x80 /* set VBUS valid threshold and disconnect valid threshold */
-						0x38 0x81 /* update DC voltage level */
-						0x3C 0x82 /* set preemphasis and rise/fall time */
-						0x13 0x83 /* set source impedance adjusment */
-						>;
-				};
-			};
-		};
-
 		riva-pil@3204000 {
 			status = "okay";
 
