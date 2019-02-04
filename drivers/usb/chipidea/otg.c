@@ -123,7 +123,7 @@ enum ci_role ci_otg_role(struct ci_hdrc *ci)
 		? CI_ROLE_GADGET
 		: CI_ROLE_HOST;
 
-	return CI_ROLE_GADGET; //role;
+	return role;
 }
 
 void ci_handle_vbus_change(struct ci_hdrc *ci)
