@@ -497,8 +497,6 @@ afab: 533000000
 
 		usb@12500000 {
 			status = "okay";
-			/* use peripheral mode until we hook up otg detection */
-			dr_mode = "peripheral";
 			ulpi {
 				phy {
 					v3p3-supply = <&pm8038_l3>;
