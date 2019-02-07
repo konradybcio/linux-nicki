@@ -4,7 +4,7 @@
 #include "qcom-msm8930.dtsi"
 
 /*
-missing: flash, camera, (status leds?), radio?,
+missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 */
 
 / {
@@ -14,8 +14,6 @@ missing: flash, camera, (status leds?), radio?,
 	chosen {
 		bootargs = "cma=64m";
 		stdout-path = "serial0:115200n8";
-		//linux,initrd-start = <0x82200000>;
-		//linux,initrd-end = <0x82a54f30>;
 	};
 
 	soc {
