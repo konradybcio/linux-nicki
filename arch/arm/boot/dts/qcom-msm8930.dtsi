@@ -437,7 +437,7 @@
 					qcom,num-strings = <2>;
 				};
 
-				/* xoadc: xoadc@197 {
+				xoadc: xoadc@197 {
 					compatible = "qcom,pm8038-adc";
 					reg = <197>;
 					interrupts-extended = <&pmicintc 78 IRQ_TYPE_EDGE_RISING>;
@@ -484,7 +484,7 @@
 					ref_muxoff: adc-channel@0f {
 						reg = <0x00 0x0f>;
 					};
-				}; */
+				};
 
 				smbb: charger@0 {
 					compatible = "qcom,pm8921-charger";
