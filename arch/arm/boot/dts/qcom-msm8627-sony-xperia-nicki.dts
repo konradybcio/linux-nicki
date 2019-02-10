@@ -194,7 +194,7 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 			compatible =  "qcom,adreno-305.2", "qcom,adreno"; // or .0 ?
 			reg = <0x04300000 0x20000>;
 			reg-names = "kgsl_3d0_reg_memory";
-			interrupts = <GIC_SPI 80 0>;
+			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "kgsl_3d0_irq";
 			clock-names =
 			    "core_clk",
