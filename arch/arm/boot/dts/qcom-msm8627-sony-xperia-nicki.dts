@@ -2,6 +2,8 @@
 #include <dt-bindings/input/input.h>
 
 #include "qcom-msm8930.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
 
 /*
 missing: https://gitlab.com/postmarketOS/pmaports/issues/184
@@ -350,12 +352,6 @@ afab: 533000000
 				      "lut_clk",
 				      "hdmi_clk",
 				      "tv_clk";
-#if 0
-			iommus = <&mdp_port0 0
-				  &mdp_port0 2
-				  &mdp_port1 0
-				  &mdp_port1 2>;
-#endif
 
                         iommus = <&mdp_port0 0
                                   &mdp_port0 2>;
@@ -458,22 +454,6 @@ afab: 533000000
 			interrupts =
 			    <GIC_SPI 63 IRQ_TYPE_LEVEL_HIGH>,
 			    <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
-			qcom,ncb = <2>;
-		};
-
-		mdp_port1: iommu@7600000 {
-			compatible = "qcom,apq8064-iommu";
-			#iommu-cells = <1>;
-			clock-names =
-			    "smmu_pclk",
-			    "iommu_clk";
-			clocks =
-			    <&mmcc SMMU_AHB_CLK>,
-			    <&mmcc MDP_AXI_CLK>;
-			reg = <0x07600000 0x100000>;
-			interrupts =
-			    <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>,
-			    <GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>;
 			qcom,ncb = <2>;
 		};
 
