@@ -2062,6 +2062,21 @@ static const struct panel_desc rocktech_rk070er9427 = {
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
 };
 
+// and so the honami mess begins
+
+static const struct drm_display_mode default_mode = {
+	.clock = 149614,
+	.hdisplay = 1080,
+	.hsync_start = 1080 + 128,
+	.hsync_end = 1080 + 128 + 8,
+	.htotal = 1080 + 128 + 8 + 72,
+	.vdisplay = 1920,
+	.vsync_start = 1920 + 8,
+	.vsync_end = 1920 + 8 + 4,
+	.vtotal = 1920 + 8 + 4 + 4,
+	.vrefresh = 60,
+};
+
 static const struct drm_display_mode samsung_lsn122dl01_c01_mode = {
 	.clock = 271560,
 	.hdisplay = 2560,
@@ -2979,7 +2994,12 @@ static int panel_simple_dsi_probe(struct mipi_dsi_device *dsi)
 	err = panel_simple_probe(&dsi->dev, &desc->desc);
 	if (err < 0)
 		return err;
-
+/*
+  	dsi->mode_flags = desc->flags;
+	dsi->format = MIPI_DSI_FMT_RGB888;
+	dsi->lanes = 4;
+    */
+    
 	dsi->mode_flags = desc->flags;
 	dsi->format = desc->format;
 	dsi->lanes = desc->lanes;
