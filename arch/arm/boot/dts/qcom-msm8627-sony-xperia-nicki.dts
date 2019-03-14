@@ -410,7 +410,7 @@ afab: 533000000
 
 			panel@0 {
 				reg = <0>;
-				compatible = "panel-lvds";
+				compatible = "sharp,ls043t1le01-qhd";
 
 				reset-gpios = <&msmgpio 58 GPIO_ACTIVE_HIGH>;
 

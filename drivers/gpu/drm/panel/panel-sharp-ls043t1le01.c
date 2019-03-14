@@ -218,15 +218,15 @@ static int sharp_nt_panel_enable(struct drm_panel *panel)
 }
 
 static const struct drm_display_mode default_mode = {
-	.clock = 28000,
+	.clock = 30513,
 	.hdisplay = 480,
-	.hsync_start = 480 + 100,
-	.hsync_end = 480 + 100 + 8,
-	.htotal = 480 + 100 + 8 + 100,
-	.vdisplay = 800,
-	.vsync_start = 800 + 20,
-	.vsync_end = 800 + 20 + 1,
-	.vtotal = 800 + 20 + 1 + 20,
+	.hsync_start = 480 + 46,
+	.hsync_end = 480 + 46 + 4,
+	.htotal = 480 + 46 + 4 + 44,
+	.vdisplay = 854,
+	.vsync_start = 854 + 15,
+	.vsync_end = 854 + 15 + 1,
+	.vtotal = 854 + 15 + 1 + 16,
 	.vrefresh = 60,
 };
 
@@ -246,8 +246,8 @@ static int sharp_nt_panel_get_modes(struct drm_panel *panel)
 
 	drm_mode_probed_add(panel->connector, mode);
 
-	panel->connector->display_info.width_mm = 54;
-	panel->connector->display_info.height_mm = 95;
+	panel->connector->display_info.width_mm = 51;
+	panel->connector->display_info.height_mm = 90;
 
 	return 1;
 }
