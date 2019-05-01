@@ -37,6 +37,7 @@
 #include <linux/extcon-provider.h>
 #include <linux/regulator/driver.h>
 
+#if 0
 #define SMBB_CHG_VMAX		0x040
 #define SMBB_CHG_VSAFE		0x041
 #define SMBB_CHG_CFG		0x043
@@ -88,6 +89,8 @@
 #define SMBB_MISC_BOOT_DONE	0x642
 #define BOOT_DONE		BIT(7)
 
+#endif
+
 #define STATUS_USBIN_VALID	BIT(0) /* USB connection is valid */
 #define STATUS_DCIN_VALID	BIT(1) /* DC connection is valid */
 #define STATUS_BAT_HOT		BIT(2) /* Battery temp 1=Hot, 0=Cold */
@@ -98,9 +101,76 @@
 #define STATUS_CHG_FAST		BIT(7) /* Fast charging */
 #define STATUS_CHG_GONE		BIT(8) /* No charger is connected */
 
+#define CHG_BUCK_CLOCK_CTRL	0x14
+#define CHG_BUCK_CLOCK_CTRL_8038	0xD
+
+#define PBL_ACCESS1		0x04
+#define PBL_ACCESS2		0x05
+#define SYS_CONFIG_1		0x06
+#define SYS_CONFIG_2		0x07
+#define CHG_CNTRL		0x204
+#define CHG_IBAT_MAX		0x205
+#define CHG_TEST		0x206
+#define CHG_BUCK_CTRL_TEST1	0x207
+#define CHG_BUCK_CTRL_TEST2	0x208
+#define CHG_BUCK_CTRL_TEST3	0x209
+#define COMPARATOR_OVERRIDE	0x20A
+#define PSI_TXRX_SAMPLE_DATA_0	0x20B
+#define PSI_TXRX_SAMPLE_DATA_1	0x20C
+#define PSI_TXRX_SAMPLE_DATA_2	0x20D
+#define PSI_TXRX_SAMPLE_DATA_3	0x20E
+#define PSI_CONFIG_STATUS	0x20F
+#define CHG_IBAT_SAFE		0x210
+#define CHG_ITRICKLE		0x211
+#define CHG_CNTRL_2		0x212
+#define CHG_VBAT_DET		0x213
+#define CHG_VTRICKLE		0x214
+#define CHG_ITERM		0x215
+#define CHG_CNTRL_3		0x216
+#define CHG_VIN_MIN		0x217
+#define CHG_TWDOG		0x218
+#define CHG_TTRKL_MAX		0x219
+#define CHG_TEMP_THRESH		0x21A
+#define CHG_TCHG_MAX		0x21B
+#define USB_OVP_CONTROL		0x21C
+#define DC_OVP_CONTROL		0x21D
+#define USB_OVP_TEST		0x21E
+#define DC_OVP_TEST		0x21F
+#define CHG_VDD_MAX		0x220
+#define CHG_VDD_SAFE		0x221
+#define CHG_VBAT_BOOT_THRESH	0x222
+#define USB_OVP_TRIM		0x355
+#define BUCK_CONTROL_TRIM1	0x356
+#define BUCK_CONTROL_TRIM2	0x357
+#define BUCK_CONTROL_TRIM3	0x358
+#define BUCK_CONTROL_TRIM4	0x359
+#define CHG_DEFAULTS_TRIM	0x35A
+#define CHG_ITRIM		0x35B
+#define CHG_TTRIM		0x35C
+#define CHG_COMP_OVR		0x20A
+#define IUSB_FINE_RES		0x2B6
+#define OVP_USB_UVD		0x2B7
+#define PM8921_USB_TRIM_SEL	0x339
+
+#define ENUM_TIMER_STOP_BIT	BIT(1)
+#define BOOT_DONE_BIT		BIT(6)
+#define CHG_BATFET_ON_BIT	BIT(3)
+#define CHG_VCP_EN		BIT(0)
+#define CHG_BAT_TEMP_DIS_BIT	BIT(2)
+
+#define CHG_EN_BIT	BIT(7)
+
+#define PM8921_CHG_V_MASK		0x7F
+#define PM8921_CHG_I_MASK		0x3F
+#define PM8921_CHG_ITERM_MASK	0xF
+
+#define MV(x) (((x) - 3240) / 20)
+#define MA(x) (((x) - 225) / 50)
+
 enum smbb_attr {
 	ATTR_BAT_ISAFE,
 	ATTR_BAT_IMAX,
+#if 0
 	ATTR_USBIN_IMAX,
 	ATTR_DCIN_IMAX,
 	ATTR_BAT_VSAFE,
@@ -108,17 +178,18 @@ enum smbb_attr {
 	ATTR_BAT_VMIN,
 	ATTR_CHG_VDET,
 	ATTR_VIN_MIN,
+#endif
 	_ATTR_CNT,
 };
 
 struct smbb_charger {
-	unsigned int revision;
+	// unsigned int revision;
 	unsigned int addr;
 	struct device *dev;
 	struct extcon_dev *edev;
 
 	bool dc_disabled;
-	bool jeita_ext_temp;
+	// bool jeita_ext_temp;
 	unsigned long status;
 	struct mutex statlock;
 
@@ -169,7 +240,7 @@ static int smbb_imax_fn(unsigned int index)
 
 static int smbb_bat_imax_fn(unsigned int index)
 {
-	return index * 50000;
+	return 225000 + index * 50000;
 }
 
 static unsigned int smbb_hw_lookup(unsigned int val, int (*fn)(unsigned int))
@@ -194,20 +265,21 @@ static const struct smbb_charger_attr {
 } smbb_charger_attrs[] = {
 	[ATTR_BAT_ISAFE] = {
 		.name = "qcom,fast-charge-safe-current",
-		.reg = SMBB_CHG_ISAFE,
-		.max = 3000000,
-		.min = 200000,
+		.reg = CHG_IBAT_SAFE,
+		.max = 3375000,
+		.min = 225000,
 		.hw_fn = smbb_bat_imax_fn,
 		.fail_ok = 1,
 	},
 	[ATTR_BAT_IMAX] = {
 		.name = "qcom,fast-charge-current-limit",
-		.reg = SMBB_CHG_IMAX,
-		.safe_reg = SMBB_CHG_ISAFE,
-		.max = 3000000,
-		.min = 200000,
+		.reg = CHG_IBAT_MAX,
+		.safe_reg = CHG_IBAT_SAFE,
+		.max = 3025000,
+		.min = 325000,
 		.hw_fn = smbb_bat_imax_fn,
 	},
+#if 0
 	[ATTR_DCIN_IMAX] = {
 		.name = "qcom,dc-current-limit",
 		.reg = SMBB_DC_IMAX,
@@ -259,6 +331,7 @@ static const struct smbb_charger_attr {
 		.min = 100000,
 		.hw_fn = smbb_imax_fn,
 	},
+#endif
 };
 
 static int smbb_charger_attr_write(struct smbb_charger *chg,
@@ -379,6 +452,8 @@ static void smbb_set_line_flag(struct smbb_charger *chg, int irq, int flag)
 	dev_dbg(chg->dev, "status = %03lx\n", chg->status);
 }
 
+#if 0
+
 static irqreturn_t smbb_usb_valid_handler(int irq, void *_data)
 {
 	struct smbb_charger *chg = _data;
@@ -479,10 +554,13 @@ static irqreturn_t smbb_chg_trkl_handler(int irq, void *_data)
 	return IRQ_HANDLED;
 }
 
+#endif
+
 static const struct smbb_irq {
 	const char *name;
 	irqreturn_t (*handler)(int, void *);
 } smbb_charger_irqs[] = {
+#if 0
 	{ "chg-done", smbb_chg_done_handler },
 	{ "chg-fast", smbb_chg_fast_handler },
 	{ "chg-trkl", smbb_chg_trkl_handler },
@@ -491,6 +569,7 @@ static const struct smbb_irq {
 	{ "chg-gone", smbb_chg_gone_handler },
 	{ "usb-valid", smbb_usb_valid_handler },
 	{ "dc-valid", smbb_dc_valid_handler },
+#endif
 };
 
 static int smbb_usbin_get_property(struct power_supply *psy,
@@ -508,7 +587,7 @@ static int smbb_usbin_get_property(struct power_supply *psy,
 		mutex_unlock(&chg->statlock);
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_CONTROL_LIMIT:
-		val->intval = chg->attr[ATTR_USBIN_IMAX];
+		val->intval = 0; //chg->attr[ATTR_USBIN_IMAX];
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_CONTROL_LIMIT_MAX:
 		val->intval = 2500000;
@@ -530,8 +609,7 @@ static int smbb_usbin_set_property(struct power_supply *psy,
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_CHARGE_CONTROL_LIMIT:
-		rc = smbb_charger_attr_write(chg, ATTR_USBIN_IMAX,
-				val->intval);
+		rc = 0; //smbb_charger_attr_write(chg, ATTR_USBIN_IMAX, val->intval);
 		break;
 	default:
 		rc = -EINVAL;
@@ -551,12 +629,11 @@ static int smbb_dcin_get_property(struct power_supply *psy,
 	switch (psp) {
 	case POWER_SUPPLY_PROP_ONLINE:
 		mutex_lock(&chg->statlock);
-		val->intval = !(chg->status & STATUS_CHG_GONE) &&
-				(chg->status & STATUS_DCIN_VALID);
+		val->intval = 0; // !(chg->status & STATUS_CHG_GONE) && (chg->status & STATUS_DCIN_VALID);
 		mutex_unlock(&chg->statlock);
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_CONTROL_LIMIT:
-		val->intval = chg->attr[ATTR_DCIN_IMAX];
+		val->intval = 0; //chg->attr[ATTR_DCIN_IMAX];
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_CONTROL_LIMIT_MAX:
 		val->intval = 2500000;
@@ -578,8 +655,7 @@ static int smbb_dcin_set_property(struct power_supply *psy,
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_CHARGE_CONTROL_LIMIT:
-		rc = smbb_charger_attr_write(chg, ATTR_DCIN_IMAX,
-				val->intval);
+		rc = 0; //smbb_charger_attr_write(chg, ATTR_DCIN_IMAX, val->intval);
 		break;
 	default:
 		rc = -EINVAL;
@@ -607,6 +683,7 @@ static int smbb_battery_get_property(struct power_supply *psy,
 	status = chg->status;
 	mutex_unlock(&chg->statlock);
 
+#if 0
 	switch (psp) {
 	case POWER_SUPPLY_PROP_STATUS:
 		if (status & STATUS_CHG_GONE)
@@ -661,6 +738,9 @@ static int smbb_battery_get_property(struct power_supply *psy,
 		rc = -EINVAL;
 		break;
 	}
+#endif
+	val->intval = 0;
+	return 0;
 
 	return rc;
 }
@@ -674,10 +754,10 @@ static int smbb_battery_set_property(struct power_supply *psy,
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_CURRENT_MAX:
-		rc = smbb_charger_attr_write(chg, ATTR_BAT_IMAX, val->intval);
+		rc = 0; // smbb_charger_attr_write(chg, ATTR_BAT_IMAX, val->intval);
 		break;
 	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
-		rc = smbb_charger_attr_write(chg, ATTR_BAT_VMAX, val->intval);
+		rc = 0; // smbb_charger_attr_write(chg, ATTR_BAT_VMAX, val->intval);
 		break;
 	default:
 		rc = -EINVAL;
@@ -722,9 +802,18 @@ static const struct reg_off_mask_default {
 	unsigned int value;
 	unsigned int rev_mask;
 } smbb_charger_setup[] = {
-	/* The bootloader is supposed to set this... make sure anyway. */
-	{ SMBB_MISC_BOOT_DONE, BOOT_DONE, BOOT_DONE },
+	{ SYS_CONFIG_2, BOOT_DONE_BIT, BOOT_DONE_BIT },
+	{ CHG_VDD_SAFE, PM8921_CHG_V_MASK, MV(4200) }, // 4500
+	{ CHG_VBAT_DET, PM8921_CHG_V_MASK, MV(4140) },
+	{ CHG_VDD_MAX, PM8921_CHG_V_MASK, MV(4200) }, // increments?
+	{ CHG_IBAT_SAFE, PM8921_CHG_I_MASK, MA(1500) },
+	{ CHG_IBAT_MAX, PM8921_CHG_I_MASK, MA(1100) },
+	{ CHG_VDD_MAX, PM8921_CHG_ITERM_MASK, (100 - 50) / 10 },
 
+	{PBL_ACCESS2, ENUM_TIMER_STOP_BIT, ENUM_TIMER_STOP_BIT},
+	{CHG_CNTRL_3, CHG_EN_BIT, CHG_EN_BIT},
+
+#if 0
 	/* Disable software timer */
 	{ SMBB_CHG_TCHG_MAX_EN, TCHG_MAX_EN, 0 },
 
@@ -759,6 +848,7 @@ static const struct reg_off_mask_default {
 
 	/* Enable charging */
 	{ SMBB_CHG_CTRL, CTRL_EN, CTRL_EN },
+#endif
 };
 
 static char *smbb_bif[] = { "smbb-bif" };
@@ -798,8 +888,8 @@ static int smbb_chg_otg_enable(struct regulator_dev *rdev)
 	struct smbb_charger *chg = rdev_get_drvdata(rdev);
 	int rc;
 
-	rc = regmap_update_bits(chg->regmap, chg->addr + SMBB_USB_OTG_CTL,
-				OTG_CTL_EN, OTG_CTL_EN);
+	rc = 0; /* regmap_update_bits(chg->regmap, chg->addr + SMBB_USB_OTG_CTL,
+				OTG_CTL_EN, OTG_CTL_EN); */
 	if (rc)
 		dev_err(chg->dev, "failed to update OTG_CTL\n");
 	return rc;
@@ -810,8 +900,8 @@ static int smbb_chg_otg_disable(struct regulator_dev *rdev)
 	struct smbb_charger *chg = rdev_get_drvdata(rdev);
 	int rc;
 
-	rc = regmap_update_bits(chg->regmap, chg->addr + SMBB_USB_OTG_CTL,
-				OTG_CTL_EN, 0);
+	rc = 0; /* regmap_update_bits(chg->regmap, chg->addr + SMBB_USB_OTG_CTL,
+				OTG_CTL_EN, 0); */
 	if (rc)
 		dev_err(chg->dev, "failed to update OTG_CTL\n");
 	return rc;
@@ -823,11 +913,11 @@ static int smbb_chg_otg_is_enabled(struct regulator_dev *rdev)
 	unsigned int value = 0;
 	int rc;
 
-	rc = regmap_read(chg->regmap, chg->addr + SMBB_USB_OTG_CTL, &value);
+	rc = 0; // regmap_read(chg->regmap, chg->addr + SMBB_USB_OTG_CTL, &value);
 	if (rc)
 		dev_err(chg->dev, "failed to read OTG_CTL\n");
 
-	return !!(value & OTG_CTL_EN);
+	return 0; // !!(value & OTG_CTL_EN);
 }
 
 static const struct regulator_ops smbb_chg_otg_ops = {
@@ -864,6 +954,7 @@ static int smbb_charger_probe(struct platform_device *pdev)
 		return rc;
 	}
 
+#if 0
 	rc = regmap_read(chg->regmap, chg->addr + SMBB_MISC_REV2, &chg->revision);
 	if (rc) {
 		dev_err(&pdev->dev, "unable to read revision\n");
@@ -876,6 +967,7 @@ static int smbb_charger_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 	dev_info(&pdev->dev, "Initializing SMBB rev %u", chg->revision);
+#endif
 
 	chg->dc_disabled = of_property_read_bool(pdev->dev.of_node, "qcom,disable-dc");
 
@@ -975,6 +1067,7 @@ static int smbb_charger_probe(struct platform_device *pdev)
 	if (IS_ERR(chg->otg_reg))
 		return PTR_ERR(chg->otg_reg);
 
+#if 0
 	chg->jeita_ext_temp = of_property_read_bool(pdev->dev.of_node,
 			"qcom,jeita-extended-temp-range");
 
@@ -990,12 +1083,15 @@ static int smbb_charger_probe(struct platform_device *pdev)
 			chg->jeita_ext_temp ? "JEITA extended" : "normal");
 		return rc;
 	}
+#endif
 
 	for (i = 0; i < ARRAY_SIZE(smbb_charger_setup); ++i) {
 		const struct reg_off_mask_default *r = &smbb_charger_setup[i];
 
+#if 0
 		if (r->rev_mask & BIT(chg->revision))
 			continue;
+#endif
 
 		rc = regmap_update_bits(chg->regmap, chg->addr + r->offset,
 				r->mask, r->value);
@@ -1017,7 +1113,7 @@ static int smbb_charger_remove(struct platform_device *pdev)
 
 	chg = platform_get_drvdata(pdev);
 
-	regmap_update_bits(chg->regmap, chg->addr + SMBB_CHG_CTRL, CTRL_EN, 0);
+	// regmap_update_bits(chg->regmap, chg->addr + CHG_CTRL, CTRL_EN, 0);
 
 	return 0;
 }
