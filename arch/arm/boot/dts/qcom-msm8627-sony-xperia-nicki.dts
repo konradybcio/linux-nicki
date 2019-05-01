@@ -300,7 +300,7 @@ afab: 533000000
 						<&dsi0_phy 0>,
 						<&dsi0_phy 1>,
 						<&dsi0_phy 1>;
-			// syscon-sfpb = <&mmss_sfpb>;
+			syscon-sfpb = <&mmss_sfpb>;
 			phys = <&dsi0_phy>;
 			ports {
 				#address-cells = <1>;
@@ -350,16 +350,16 @@ afab: 533000000
 				      "lut_clk",
 				      "hdmi_clk",
 				      "tv_clk";
-#if 0
+#if 1
 			iommus = <&mdp_port0 0
 				  &mdp_port0 2
 				  &mdp_port1 0
 				  &mdp_port1 2>;
 #endif
-
+#if 0
                         iommus = <&mdp_port0 0
                                   &mdp_port0 2>;
-
+#endif
 			ports {
 				#address-cells = <1>;
 				#size-cells = <0>;
