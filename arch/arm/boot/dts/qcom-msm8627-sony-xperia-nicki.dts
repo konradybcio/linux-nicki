@@ -12,7 +12,7 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 	compatible = "qcom,msm8930", "qcom,msm8627", "qcom,msm8627-mtp", "qcom,msm8227";
 
 	chosen {
-		bootargs = "cma=64m";
+		bootargs = "cma=256m";
 		stdout-path = "serial0:115200n8";
 	};
 
