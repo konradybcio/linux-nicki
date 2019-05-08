@@ -2136,36 +2136,6 @@ static const struct panel_desc rocktech_rk070er9427 = {
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
 };
 
-// and so the honami mess begins
-
-static const struct drm_display_mode honami_jdc_renesas_mode = {
-	.clock = 149614,
-	.hdisplay = 1080,
-	.hsync_start = 1080 + 128,
-	.hsync_end = 1080 + 128 + 8,
-	.htotal = 1080 + 128 + 8 + 72,
-	.vdisplay = 1920,
-	.vsync_start = 1920 + 8,
-	.vsync_end = 1920 + 8 + 4,
-	.vtotal = 1920 + 8 + 4 + 4,
-	.vrefresh = 60,
-};
-
-static const struct panel_desc_dsi honami_jdc_renesas = {
-	.desc = {
-		.modes = &honami_jdc_renesas_mode,
-		.num_modes = 1,
-		.bpc = 8,
-		.size = {
-			.width = 62,
-			.height = 110,
-		},
-	},
-	.flags = 0,
-	.format = MIPI_DSI_FMT_RGB888,
-	.lanes = 4,
-};
-
 static const struct drm_display_mode samsung_lsn122dl01_c01_mode = {
 	.clock = 271560,
 	.hdisplay = 2560,
@@ -2867,10 +2837,7 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "winstar,wf35ltiacd",
 		.data = &winstar_wf35ltiacd,
-+	}, {
-+		.compatible = "honami,jdc_renesas",
-+		.data = &honami_jdc_renesas
- 	}, {
+	}, {
  		/* sentinel */
  	}
 };
@@ -2969,6 +2936,36 @@ static const struct panel_desc_dsi boe_tv080wum_nl0 = {
 	.flags = MIPI_DSI_MODE_VIDEO |
 		 MIPI_DSI_MODE_VIDEO_BURST |
 		 MIPI_DSI_MODE_VIDEO_SYNC_PULSE,
+	.format = MIPI_DSI_FMT_RGB888,
+	.lanes = 4,
+};
+
+// and so the honami mess begins
+
+static const struct drm_display_mode honami_jdc_renesas_mode = {
+	.clock = 149614,
+	.hdisplay = 1080,
+	.hsync_start = 1080 + 128,
+	.hsync_end = 1080 + 128 + 8,
+	.htotal = 1080 + 128 + 8 + 72,
+	.vdisplay = 1920,
+	.vsync_start = 1920 + 8,
+	.vsync_end = 1920 + 8 + 4,
+	.vtotal = 1920 + 8 + 4 + 4,
+	.vrefresh = 60,
+};
+
+static const struct panel_desc_dsi honami_jdc_renesas = {
+	.desc = {
+		.modes = &honami_jdc_renesas_mode,
+		.num_modes = 1,
+		.bpc = 8,
+		.size = {
+			.width = 62,
+			.height = 110,
+		},
+	},
+	.flags = 0,
 	.format = MIPI_DSI_FMT_RGB888,
 	.lanes = 4,
 };
@@ -3106,6 +3103,9 @@ static const struct of_device_id dsi_of_match[] = {
 		.compatible = "lg,acx467akm-7",
 		.data = &lg_acx467akm_7
 	}, {
+		.compatible = "honami,jdc-renesas",
+		.data = &honami_jdc_renesas
+ 	}, {
 		/* sentinel */
 	}
 };
