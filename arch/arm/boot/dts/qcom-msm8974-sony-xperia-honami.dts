@@ -425,17 +425,15 @@
             };
 
             panel: panel@0 {
-		//compatible = "sharp,ls052t3sx02";
-
-		reg = <0>;
-		port {
-
+				//compatible = "sharp,ls052t3sx02";
+				reg = <0>;
+				
+				port {
                     panel_in: endpoint {
                         remote-endpoint = <&dsi0_out>;
                     };
                 };
             };
-
         };
 
         dsi_phy0: dsi-phy@fd922a00 {
