@@ -2965,7 +2965,7 @@ static const struct panel_desc_dsi honami_jdc_renesas = {
 			.height = 110,
 		},
 	},
-	.flags = 0,
+	.flags = MIPI_DSI_MODE_VIDEO,
 	.format = MIPI_DSI_FMT_RGB888,
 	.lanes = 4,
 };
