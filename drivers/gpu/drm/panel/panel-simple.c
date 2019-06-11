@@ -2943,7 +2943,7 @@ static const struct panel_desc_dsi boe_tv080wum_nl0 = {
 // and so the honami mess begins
 
 static const struct drm_display_mode honami_jdc_renesas_mode = {
-	.clock = 149614,
+	.clock = 149614, // 149614.08??
 	.hdisplay = 1080,
 	.hsync_start = 1080 + 128,
 	.hsync_end = 1080 + 128 + 8,
@@ -2965,7 +2965,7 @@ static const struct panel_desc_dsi honami_jdc_renesas = {
 			.height = 110,
 		},
 	},
-	.flags = MIPI_DSI_MODE_VIDEO,
+	.flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_LPM | MIPI_DSI_MODE_EOT_PACKET | MIPI_DSI_MODE_VIDEO_HSE | MIPI_DSI_CLOCK_NON_CONTINUOUS | MIPI_DSI_MODE_VIDEO_SYNC_PULSE,
 	.format = MIPI_DSI_FMT_RGB888,
 	.lanes = 4,
 };
