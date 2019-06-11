@@ -498,7 +498,7 @@
 
  			panel: panel@0 {
 				reg = <0>;
-				compatible = "honami,jdc-renesas";
+				compatible = "jdc,renesas-1080p-vid";
 
  				pinctrl-names = "default";
 				pinctrl-0 = <&panel_pin>;
@@ -507,7 +507,9 @@
 				enable-gpios = <&msmgpio 46 0>;
 				reset-gpios = <&pm8941_gpios 19 0>;
 
-
+				vdd-supply = <&pm8941_lvs3>;
+				vddio-supply = <&pm8941_l12>;
+				vdda-supply = <&pm8941_l2>;
  				port {
 					panel_in: endpoint {
 						remote-endpoint = <&dsi0_out>;
