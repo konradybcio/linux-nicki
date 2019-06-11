@@ -1,0 +1,28 @@
+JDC RENESAS 1080p DSI Panel Driver
+
+Required properties:
+- compatible:	should be "jdc,renesas-1080p-vid"
+
+Optional properties:
+- vdd-supply:	phandle for vdd regulator device node.
+- vddio-supply:	phandle for vddio regulator device node.
+- vdda-supply:	phandle for vdda regulator device node.
+- reset-gpio:	specifies the panel reset gpio.
+- enable-gpio:	specifies the gpio used for TE.
+- te-gpio:	specifies the panel lcd/display enable gpio.
+- backlight:	phandle of the backlight device attached to the panel
+
+Example:
+
+	panel: panel@0 {
+		compatible = "jdc,renesas-1080p-vid";
+		reg = <0>;
+
+		vdd-supply = <...>;
+		vddio-supply = <...>;
+		vdda-supply = <...>;
+		reset-gpio = <...>;
+		enable-gpio = <...>;
+		te-gpio = <...>;
+		backlight = <...>;
+	};

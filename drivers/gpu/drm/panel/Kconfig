@@ -76,6 +76,17 @@ config DRM_PANEL_INNOLUX_P079ZCA
 	  24 bit RGB per pixel. It provides a MIPI DSI interface to
 	  the host and has a built-in LED backlight.
 
+config DRM_PANEL_JDC_RENESAS
+	tristate "JDC Renesas 1080p DSI Panel"
+	depends on OF
+	depends on DRM_MIPI_DSI
+	depends on BACKLIGHT_CLASS_DEVICE
+	help
+	  Say Y here if you want to enable support for JDC Renesas DSI
+	  video mode panel as found in Sony Xperia Z1 devices.
+	  The panel has a 1080×1920 resolution and uses
+	  24 bit per pixel.
+
 config DRM_PANEL_JDI_LT070ME05000
 	tristate "JDI LT070ME05000 WUXGA DSI panel"
 	depends on OF
