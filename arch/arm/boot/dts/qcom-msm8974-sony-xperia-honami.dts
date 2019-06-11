@@ -424,6 +424,36 @@
 			};
 		};
 
+		panel_pin: panel {
+			te_pin: te {
+				pins = "gpio12";
+				function = "mdp_vsync";
+
+				drive-strength = <2>;
+				bias-pull-down;
+				input-enable;
+			};
+
+			panel_enable: enable {
+				pins = "gpio58";
+				function = "gpio";
+
+				drive-strength = <8>;
+				bias-disable;
+				output-high;
+			};
+
+			disp_esd: esd {
+				pins = "gpio28";
+				function = "gpio";
+
+				drive-strength = <2>;
+				bias-pull-down;
+				input-enable;
+			};
+
+		};
+
 		ts_int_pin: touch-int {
 			pin {
 				pins = "gpio61";
@@ -470,8 +500,13 @@
 				reg = <0>;
 				compatible = "honami,jdc-renesas";
 
- 				//pinctrl-names = "default";
-				//pinctrl-0 = <&panel_pin>;
+ 				pinctrl-names = "default";
+				pinctrl-0 = <&panel_pin>;
+				
+				disp-te-gpios = <&msmgpio 12 0>;
+				enable-gpios = <&msmgpio 58 0>;
+				reset-gpios = <&pm8941_gpios 19 0>;
+
 
  				port {
 					panel_in: endpoint {
