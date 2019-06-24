@@ -59,40 +59,59 @@ static int jdi_panel_init(struct jdi_panel *jdi)
 	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
 	ret = mipi_dsi_generic_write(dsi, cmd_on1, sizeof(cmd_on1));
-	if (ret < 0)
+	if (ret < 0){
+		pr_info("1\n");
 		return ret;
+	}
+	
 
 	ret = mipi_dsi_dcs_write(dsi, 0xB0, (u8[]){ 0x00 }, 1);
-	if (ret < 0)
+	if (ret < 0){
+		pr_info("2\n");
 		return ret;
+	}
 
 	ret = mipi_dsi_dcs_write(dsi, 0xD6, (u8[]){ 0x01 }, 1);
-	if (ret < 0)
+	if (ret < 0){
+		pr_info("3\n");
 		return ret;
+	}
 
 	ret = mipi_dsi_dcs_write(dsi, 0xC7, NULL, 0);
 	if (ret < 0)
-		return ret;
+		{pr_info("4\n");
+		return ret;}
+	
 
 	ret = mipi_dsi_dcs_write(dsi, 0x3D, cmd_on2, sizeof(cmd_on2));
 	if (ret < 0)
-		return ret;
+		{pr_info("5\n");
+		return ret;}
+	
 
 	ret = mipi_dsi_dcs_write(dsi, 0xC8, NULL, 0);
 	if (ret < 0)
-		return ret;
+		{pr_info("6\n");
+		return ret;}
+	
 
 	ret = mipi_dsi_dcs_write(dsi, 0x3F, cmd_on3, sizeof(cmd_on3));
 	if (ret < 0)
-		return ret;
+		{pr_info("7\n");
+		return ret;}
+	
 
 	ret = mipi_dsi_dcs_write(dsi, 0xC9, NULL, 0);
 	if (ret < 0)
-		return ret;
+		{pr_info("8\n");
+		return ret;}
+	
 
 	ret = mipi_dsi_dcs_write(dsi, 0x40, cmd_on4, sizeof(cmd_on4));
 	if (ret < 0)
-		return ret;
+		{pr_info("9\n");
+		return ret;}
+	
 
 	msleep(1);
 
