@@ -1156,6 +1156,8 @@
 				interrupt-parent = <&mdss>;
 				interrupts = <4 IRQ_TYPE_LEVEL_HIGH>;
 
+				//power-domains = <&mmcc MDSS_GDSC>;
+
 				assigned-clocks = <&mmcc BYTE0_CLK_SRC>,
 				                  <&mmcc PCLK0_CLK_SRC>;
 				assigned-clock-parents = <&dsi_phy0 0>,
@@ -1212,6 +1214,7 @@
 				#clock-cells = <1>;
 				#phy-cells = <0>;
 				qcom,dsi-phy-index = <0>;
+				//power-domains = <&mmcc MDSS_GDSC>;
 
 				clocks = <&mmcc MDSS_AHB_CLK>;
 				clock-names = "iface";

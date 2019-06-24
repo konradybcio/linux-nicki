@@ -504,7 +504,9 @@
 				pinctrl-0 = <&panel_pin>;
 				
 				disp-te-gpios = <&msmgpio 12 0>;
+				//enable-gpios = <&msmgpio 46 1>;
 				enable-gpios = <&msmgpio 46 0>;
+				//reset-gpios = <&pm8941_gpios 19 GPIO_ACTIVE_HIGH>;
 				reset-gpios = <&pm8941_gpios 19 0>;
 
 				vdd-supply = <&pm8941_lvs3>;
