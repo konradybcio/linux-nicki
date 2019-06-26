@@ -503,6 +503,8 @@
  				pinctrl-names = "default";
 				pinctrl-0 = <&panel_pin>;
 				
+				backlight = <&pm8941_wled>;
+
 				te-gpio = <&msmgpio 12 0>;
 				enable-gpios = <&msmgpio 46 0>;
 				reset-gpios = <&pm8941_gpios 19 0>;
