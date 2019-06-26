@@ -503,7 +503,7 @@
  				pinctrl-names = "default";
 				pinctrl-0 = <&panel_pin>;
 				
-				disp-te-gpios = <&msmgpio 12 0>;
+				te-gpio = <&msmgpio 12 0>;
 				enable-gpios = <&msmgpio 46 0>;
 				reset-gpios = <&pm8941_gpios 19 0>;
 
