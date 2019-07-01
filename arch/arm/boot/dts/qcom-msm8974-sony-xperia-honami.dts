@@ -480,6 +480,7 @@
  		dsi@fd922800 {
 			status = "ok";
 
+			power-domains = <&mmcc MDSS_GDSC>;
  			vdda-supply = <&pm8941_l2>;
 			vdd-supply = <&pm8941_lvs3>;
 			vddio-supply = <&pm8941_l12>;
@@ -506,12 +507,13 @@
 				backlight = <&pm8941_wled>;
 
 				te-gpio = <&msmgpio 12 0>;
-				enable-gpios = <&msmgpio 46 0>;
+				enable-gpios = <&msmgpio 46 1>;
 				reset-gpios = <&pm8941_gpios 19 0>;
 
 				vdd-supply = <&pm8941_lvs3>;
 				vddio-supply = <&pm8941_l12>;
 				vdda-supply = <&pm8941_l2>;
+
  				port {
 					panel_in: endpoint {
 						remote-endpoint = <&dsi0_out>;
@@ -522,7 +524,7 @@
 
  		dsi-phy@fd922a00 {
 			status = "ok";
-
+			power-domains = <&mmcc MDSS_GDSC>;
  			vddio-supply = <&pm8941_l12>;
 		};
 	};
