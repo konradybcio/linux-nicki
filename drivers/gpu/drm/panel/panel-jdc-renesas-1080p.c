@@ -32,8 +32,8 @@ struct jdi_panel {
 
 	struct gpio_desc *enable_gpio;
 	struct gpio_desc *reset_gpio;
-	struct gpio_desc *te_gpio;
-	struct backlight_device *backlight;
+	//struct gpio_desc *te_gpio;
+	//struct backlight_device *backlight;
 
 	bool prepared;
 	bool enabled;
@@ -41,7 +41,7 @@ struct jdi_panel {
 	const struct drm_display_mode *mode;
 };
 
-static const u8 cmd_on1[2] = { 0x01, 0x29 };
+static const u8 cmd_on1[2] = { 0xB0, 0x04 };
 static const u8 cmd_on2[4] = { 0x52, 0x54, 0x68, 0x78 };
 static const u8 cmd_on3[4] = { 0x4F, 0x50, 0x5D, 0x78 };
 static const u8 cmd_on4[4] = { 0x51, 0x53, 0x5C, 0x78 };
@@ -58,7 +58,8 @@ static int jdi_panel_init(struct jdi_panel *jdi)
 
 	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
-	ret = mipi_dsi_generic_write(dsi, cmd_on1, sizeof(cmd_on1));
+	//ret = mipi_dsi_generic_write(dsi, cmd_on1, sizeof(cmd_on1));
+	ret = mipi_dsi_generic_write(dsi, (u8[]){ 0xb0, 0x04 }, 2);
 	if (ret < 0){
 		pr_info("1\n");
 		return ret;
@@ -165,7 +166,7 @@ static int jdi_panel_disable(struct drm_panel *panel)
 	if (!jdi->enabled)
 		return 0;
 
-	backlight_disable(jdi->backlight);
+	//backlight_disable(jdi->backlight);
 
 	jdi->enabled = false;
 
@@ -191,7 +192,7 @@ static int jdi_panel_unprepare(struct drm_panel *panel)
 
 	gpiod_set_value(jdi->reset_gpio, 1);
 
-	gpiod_set_value(jdi->te_gpio, 0);
+	//gpiod_set_value(jdi->te_gpio, 0);
 
 	jdi->prepared = false;
 
@@ -215,8 +216,8 @@ static int jdi_panel_prepare(struct drm_panel *panel)
 
 	msleep(20);
 
-	gpiod_set_value(jdi->te_gpio, 1);
-	usleep_range(10, 20);
+	//gpiod_set_value(jdi->te_gpio, 1);
+	//usleep_range(10, 20);
 
 	gpiod_set_value(jdi->reset_gpio, 0);
 	usleep_range(10, 20);
@@ -249,7 +250,7 @@ poweroff:
 
 	gpiod_set_value(jdi->reset_gpio, 1);
 
-	gpiod_set_value(jdi->te_gpio, 0);
+	//gpiod_set_value(jdi->te_gpio, 0);
 
 	return ret;
 }
@@ -261,7 +262,7 @@ static int jdi_panel_enable(struct drm_panel *panel)
 	if (jdi->enabled)
 		return 0;
 
-	backlight_enable(jdi->backlight);
+	//backlight_enable(jdi->backlight);
 
 	jdi->enabled = true;
 
@@ -305,7 +306,7 @@ static int jdi_panel_get_modes(struct drm_panel *panel)
 
 	return 1;
 }
-
+/*
 static int dsi_dcs_bl_update_status(struct backlight_device *bl)
 {
 	struct mipi_dsi_device *dsi = bl_get_data(bl);
@@ -338,11 +339,13 @@ static int dsi_dcs_bl_get_brightness(struct backlight_device *bl)
 
 	return brightness & 0xff;
 }
-
+*/
+/*
 static const struct backlight_ops dsi_bl_ops = {
 	.update_status = dsi_dcs_bl_update_status,
 	.get_brightness = dsi_dcs_bl_get_brightness,
 };
+
 
 static struct backlight_device *
 drm_panel_create_dsi_backlight(struct mipi_dsi_device *dsi)
@@ -358,7 +361,7 @@ drm_panel_create_dsi_backlight(struct mipi_dsi_device *dsi)
 	return devm_backlight_device_register(dev, dev_name(dev), dev, dsi,
 					      &dsi_bl_ops, &props);
 }
-
+*/
 static const struct drm_panel_funcs jdi_panel_funcs = {
 	.disable = jdi_panel_disable,
 	.unprepare = jdi_panel_unprepare,
@@ -404,20 +407,23 @@ static int jdi_panel_add(struct jdi_panel *jdi)
 		dev_err(dev, "Cannot get reset-gpio %d\n", ret);
 		return ret;
 	}
-
+/*
 	jdi->te_gpio = devm_gpiod_get(dev, "te", GPIOD_OUT_LOW);
 	if (IS_ERR(jdi->te_gpio)) {
 		ret = PTR_ERR(jdi->te_gpio);
 		dev_err(dev, "Cannot get te-gpio %d\n", ret);
 		return ret;
 	}
+*/
 
+/*
 	jdi->backlight = drm_panel_create_dsi_backlight(jdi->dsi);
 	if (IS_ERR(jdi->backlight)) {
 		ret = PTR_ERR(jdi->backlight);
 		dev_err(dev, "Failed to register backlight %d\n", ret);
 		return ret;
 	}
+	*/
 
 	drm_panel_init(&jdi->base);
 	jdi->base.funcs = &jdi_panel_funcs;
