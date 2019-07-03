@@ -630,6 +630,7 @@
 
 		usb1: usb@12500000 {
 			compatible = "qcom,ci-hdrc";
+			dr_mode = "peripheral";
 			reg = <0x12500000 0x200>,
 			      <0x12500200 0x200>;
 			interrupts = <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>;
