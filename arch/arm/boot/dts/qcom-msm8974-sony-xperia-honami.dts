@@ -2,6 +2,7 @@
 #include "qcom-msm8974.dtsi"
 #include "qcom-pm8841.dtsi"
 #include "qcom-pm8941.dtsi"
+//#include "sirius-hack.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
@@ -428,31 +429,30 @@
 			te_pin: te {
 				pins = "gpio12";
 				function = "mdp_vsync";
-
 				drive-strength = <2>;
 				bias-pull-down;
-				input-enable;
+				input-enable; //?
 			};
+		};
 
-			panel_enable: enable {
+		panel_enable: enable {
+			mux {
 				pins = "gpio46";
 				function = "gpio";
-
 				drive-strength = <8>;
 				bias-disable;
 				output-high;
 			};
-
-			disp_esd: esd {
-				pins = "gpio28";
-				function = "gpio";
-
-				drive-strength = <2>;
-				bias-pull-down;
-				input-enable;
-			};
-
 		};
+			
+		// disp_reset_n_gpio: disp_reset_n_gpio {
+		// 	mux {
+		// 		pins = "gpio19";
+		// 		function = "gpio";
+		// 		drive-strength = <1>;
+		// 		output-low;
+		// 	};
+		// };
 
 		ts_int_pin: touch-int {
 			pin {
@@ -502,11 +502,11 @@
 				compatible = "jdc,renesas-1080p-vid";
 
  				pinctrl-names = "default";
-				pinctrl-0 = <&panel_pin>;
+				pinctrl-0 = <&panel_enable &panel_pin>;
 				
 				backlight = <&pm8941_wled>;
 
-				te-gpio = <&msmgpio 12 0>;
+				disp-te-gpio = <&msmgpio 12 0>;
 				enable-gpios = <&msmgpio 46 1>;
 				reset-gpios = <&pm8941_gpios 19 0>;
 
