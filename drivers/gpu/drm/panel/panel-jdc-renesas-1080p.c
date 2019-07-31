@@ -14,9 +14,13 @@
 #include <drm/drmP.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_mipi_dsi.h>
+#include <drm/drm_device.h>
+#include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
 
 #include <video/mipi_display.h>
+#include <video/of_videomode.h>
+#include <video/videomode.h>
 
 static const char * const regulator_names[] = {
 	"vdd",
@@ -41,10 +45,29 @@ struct jdi_panel {
 	const struct drm_display_mode *mode;
 };
 
-static const u8 cmd_on1[2] = { 0x01, 0x29 };
-static const u8 cmd_on2[4] = { 0x52, 0x54, 0x68, 0x78 };
-static const u8 cmd_on3[4] = { 0x4F, 0x50, 0x5D, 0x78 };
-static const u8 cmd_on4[4] = { 0x51, 0x53, 0x5C, 0x78 };
+static const u8 cmd_on1[2] = { 0xB0, 0x00 };
+static const u8 cmd_on2[2] = { 0xD6, 0x01 };
+static const u8 cmd_on3[25] =
+		{
+			0xC7, 0x07, 0x08, 0x0B, 0x12, 0x22, 0x3D, 0x30,
+			0x3D, 0x52, 0x54, 0x68, 0x78, 0x07, 0x08, 0x0B,
+			0x12, 0x22, 0x3D, 0x30, 0x3D, 0x52, 0x54, 0x68,
+				0x78
+		};
+static const u8 cmd_on4[25] =
+		{
+				0xC8, 0x07, 0x12, 0x1A, 0x25, 0x32, 0x45, 0x33,
+				0x3F, 0x4F, 0x50, 0x5D, 0x78, 0x07, 0x12, 0x1A,
+				0x25, 0x32, 0x45, 0x33, 0x3F, 0x4F, 0x50, 0x5D,
+				0x78
+		};
+static const u8 cmd_on5[25] =
+		{
+				0xC9, 0x07, 0x21, 0x2B, 0x33, 0x3D, 0x4C, 0x35,
+				0x40, 0x51, 0x53, 0x5C, 0x78, 0x07, 0x21, 0x2B,
+				0x33, 0x3D, 0x4C, 0x35, 0x40, 0x51, 0x53, 0x5C,
+				0x78
+		};
 
 static inline struct jdi_panel *to_jdi_panel(struct drm_panel *panel)
 {
@@ -54,74 +77,50 @@ static inline struct jdi_panel *to_jdi_panel(struct drm_panel *panel)
 static int jdi_panel_init(struct jdi_panel *jdi)
 {
 	struct mipi_dsi_device *dsi = jdi->dsi;
-	int ret;
+	ssize_t wr_sz = 0;
+	int rc = 0;
 
 	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
-	ret = mipi_dsi_generic_write(dsi, cmd_on1, sizeof(cmd_on1));
-	if (ret < 0){
+	wr_sz = mipi_dsi_generic_write(dsi, cmd_on1, sizeof(cmd_on1));
+	if (wr_sz < 0){
 		pr_info("1\n");
-		return ret;
+		return wr_sz;
 	}
-	
 
-	ret = mipi_dsi_dcs_write(dsi, 0xB0, (u8[]){ 0x00 }, 1);
-	if (ret < 0){
+	wr_sz = mipi_dsi_generic_write(dsi, cmd_on2, sizeof(cmd_on2));
+	if (wr_sz < 0){
 		pr_info("2\n");
-		return ret;
+		return wr_sz;
 	}
 
-	ret = mipi_dsi_dcs_write(dsi, 0xD6, (u8[]){ 0x01 }, 1);
-	if (ret < 0){
-		pr_info("3\n");
-		return ret;
+	wr_sz = mipi_dsi_generic_write(dsi, cmd_on3, sizeof(cmd_on3));
+	if (wr_sz < 0)
+		{pr_info("3\n");
+		return wr_sz;
 	}
+	
 
-	ret = mipi_dsi_dcs_write(dsi, 0xC7, NULL, 0);
-	if (ret < 0)
+	wr_sz = mipi_dsi_generic_write(dsi, cmd_on4, sizeof(cmd_on4));
+	if (wr_sz < 0)
 		{pr_info("4\n");
-		return ret;}
+		return wr_sz;
+	}
 	
 
-	ret = mipi_dsi_dcs_write(dsi, 0x3D, cmd_on2, sizeof(cmd_on2));
-	if (ret < 0)
+	wr_sz = mipi_dsi_generic_write(dsi, cmd_on5, sizeof(cmd_on5));
+	if (wr_sz < 0)
 		{pr_info("5\n");
-		return ret;}
-	
+		return wr_sz;
+	}
 
-	ret = mipi_dsi_dcs_write(dsi, 0xC8, NULL, 0);
-	if (ret < 0)
-		{pr_info("6\n");
-		return ret;}
-	
+	rc = mipi_dsi_dcs_exit_sleep_mode(dsi);
+	if (rc < 0) {
+		return rc;
+	}
+	msleep(120);
 
-	ret = mipi_dsi_dcs_write(dsi, 0x3F, cmd_on3, sizeof(cmd_on3));
-	if (ret < 0)
-		{pr_info("7\n");
-		return ret;}
-	
-
-	ret = mipi_dsi_dcs_write(dsi, 0xC9, NULL, 0);
-	if (ret < 0)
-		{pr_info("8\n");
-		return ret;}
-	
-
-	ret = mipi_dsi_dcs_write(dsi, 0x40, cmd_on4, sizeof(cmd_on4));
-	if (ret < 0)
-		{pr_info("9\n");
-		return ret;}
-	
-
-	msleep(1);
-
-	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
-	if (ret < 0)
-		return ret;
-
-	msleep(30);
-
-	return ret;
+	return rc;
 }
 
 static int jdi_panel_on(struct jdi_panel *jdi)
@@ -218,7 +217,7 @@ static int jdi_panel_prepare(struct drm_panel *panel)
 	gpiod_set_value(jdi->te_gpio, 1);
 	usleep_range(10, 20);
 
-	gpiod_set_value(jdi->reset_gpio, 0);
+	gpiod_set_value(jdi->reset_gpio, 1);
 	usleep_range(10, 20);
 
 	gpiod_set_value(jdi->enable_gpio, 1);
@@ -442,7 +441,7 @@ static int jdi_panel_probe(struct mipi_dsi_device *dsi)
 	dsi->lanes = 4;
 	dsi->format = MIPI_DSI_FMT_RGB888;
 	dsi->mode_flags =  MIPI_DSI_MODE_VIDEO_HSE | MIPI_DSI_MODE_VIDEO |
-			   MIPI_DSI_CLOCK_NON_CONTINUOUS;
+			   MIPI_DSI_CLOCK_NON_CONTINUOUS | MIPI_DSI_MODE_EOT_PACKET;
 
 	jdi = devm_kzalloc(&dsi->dev, sizeof(*jdi), GFP_KERNEL);
 	if (!jdi)
