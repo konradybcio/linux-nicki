@@ -19,11 +19,7 @@ struct renesas_jdc {
 	struct backlight_device *backlight;
 	struct gpio_desc *reset_gpio;
 
-	struct regulator *vdd_supply;
-//	struct regulator *vdda_supply;
-// rhine_panel_power_supply (https://github.com/sonyxperiadev/kernel/blob/aosp/LA.BR.1.3.3_rb2.14/arch/arm/boot/dts/qcom/msm8974-rhine_common.dtsi#L281)
-// only uses vdd and vddio but somebody said vdda is also needed, yet I only see this in mdss node and not in panel itself
-	struct regulator *vddio_supply;
+	struct regulator_bulk_data supplies[2];
 
 	bool prepared;
 	bool enabled;
@@ -124,23 +120,11 @@ static int renesas_jdc_prepare(struct drm_panel *panel)
 	if (ctx->prepared)
 		return 0;
 
-	ret = regulator_enable(ctx->vdd_supply);
-        if (ret < 0) {
-                dev_err(dev, "Failed to enable regulator: %d\n", ret);
-                return ret;
-    }
-	
-	// ret = regulator_enable(ctx->vdda_supply);
-    //     if (ret < 0) {
-    //             dev_err(dev, "Failed to enable regulator: %d\n", ret);
-    //             return ret;
-    // }
-
-	ret = regulator_enable(ctx->vddio_supply);
-        if (ret < 0) {
-                dev_err(dev, "Failed to enable regulator: %d\n", ret);
-                return ret;
-    }
+	ret = regulator_bulk_enable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
+	if (ret < 0) {
+		dev_err(dev, "Failed to enable regulators: %d\n", ret);
+		return ret;
+	}
 
 	renesas_jdc_reset(ctx);
 
@@ -148,9 +132,7 @@ static int renesas_jdc_prepare(struct drm_panel *panel)
 	if (ret < 0) {
 		dev_err(dev, "Failed to initialize panel: %d\n", ret);
 		gpiod_set_value_cansleep(ctx->reset_gpio, 0);
-		regulator_disable(ctx->vdd_supply);
-		// regulator_disable(ctx->vdda_supply);
-		regulator_disable(ctx->vddio_supply);
+		regulator_bulk_disable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
 		return ret;
 	}
 
@@ -173,9 +155,7 @@ static int renesas_jdc_unprepare(struct drm_panel *panel)
 
 	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
 
-	regulator_disable(ctx->vdd_supply);
-	// regulator_disable(ctx->vdda_supply);
-	regulator_disable(ctx->vddio_supply);
+	regulator_bulk_disable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
 
 	ctx->prepared = false;
 	return 0;
@@ -268,26 +248,14 @@ static int renesas_jdc_probe(struct mipi_dsi_device *dsi)
 	if (!ctx)
 		return -ENOMEM;
 
-	ctx->vdd_supply = devm_regulator_get(dev, "power");
-        if (IS_ERR(ctx->vdd_supply)) {
-                ret = PTR_ERR(ctx->vdd_supply);
-                dev_err(dev, "Failed to get power regulator: %d\n", ret);
-                return ret;
-    }
-	
-	// ctx->vdda_supply = devm_regulator_get(dev, "power");
-    //     if (IS_ERR(ctx->vdda_supply)) {
-    //             ret = PTR_ERR(ctx->vdda_supply);
-    //             dev_err(dev, "Failed to get power regulator: %d\n", ret);
-    //             return ret;
-    // }
-
-	ctx->vddio_supply = devm_regulator_get(dev, "power");
-        if (IS_ERR(ctx->vddio_supply)) {
-                ret = PTR_ERR(ctx->vddio_supply);
-                dev_err(dev, "Failed to get power regulator: %d\n", ret);
-                return ret;
-    }
+	ctx->supplies[0].supply = "vdd";
+	ctx->supplies[1].supply = "vddio";
+	ret = devm_regulator_bulk_get(dev, ARRAY_SIZE(ctx->supplies),
+				      ctx->supplies);
+	if (ret < 0) {
+		dev_err(dev, "Failed to get regulators: %d\n", ret);
+		return ret;
+	}
 
 	ctx->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
 	if (IS_ERR(ctx->reset_gpio)) {

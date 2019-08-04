@@ -496,8 +496,8 @@
 				vdd-supply = <&pm8941_lvs3>;
 				vddio-supply = <&pm8941_l12>;
 
-				te-gpio = <&msmgpio 12 0>;
-				enable-gpios = <&msmgpio 46 1>;
+				disp-te-gpios = <&msmgpio 12 0>;
+				disp-enable-gpios = <&msmgpio 46 0>;
 				reset-gpios = <&pm8941_gpios 19 0>;
 
 				pinctrl-names = "default";
