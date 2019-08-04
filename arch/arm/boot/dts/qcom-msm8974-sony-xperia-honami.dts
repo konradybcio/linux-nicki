@@ -60,7 +60,7 @@
 		device_type = "memory";
 	};
 
-	bat: battery {
+	battery: battery {
 		compatible = "simple-battery";
 		voltage-min-design-microvolt = <3400000>;
 		voltage-max-design-microvolt = <4350000>;
@@ -445,6 +445,16 @@
 				input-enable;
 			};
 		};
+		
+		panel_pin: panel {
+			te {
+				pins = "gpio12";
+				function = "mdp_vsync";
+
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
 	};
 
 	dma-controller@f9944000 {
@@ -479,8 +489,16 @@
 
 			panel: panel@0 {
 				reg = <0>;
-				//compatible = "TODO";
-				status = "disabled";
+				compatible = "jdc,renesas";
+
+				backlight = <&pm8941_wled>;
+
+				vdd-supply = <&pm8941_lvs3>;
+				vddio-supply = <&pm8941_l12>;
+
+				te-gpio = <&msmgpio 12 0>;
+				enable-gpios = <&msmgpio 46 1>;
+				reset-gpios = <&pm8941_gpios 19 0>;
 
 				pinctrl-names = "default";
 				pinctrl-0 = <&panel_pin>;
@@ -513,7 +531,7 @@
 			qcom,auto-recharge-threshold-voltage = <4200000>;
 			qcom,minimum-input-voltage = <4300000>;
 
-			monitored-battery = <&bat>;
+			monitored-battery = <&battery>;
 		};
 
 		gpios@c000 {
